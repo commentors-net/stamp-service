@@ -1,4 +1,4 @@
-﻿Microsoft Visual Studio Solution File, Format Version 12.00
+Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
@@ -11,27 +11,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StampService.AdminCLI", "src\StampService.AdminCLI\StampService.AdminCLI.csproj", "{D4E5F6A7-B8C9-0123-DEF1-234567890123}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StampService.Tests", "src\StampService.Tests\StampService.Tests.csproj", "{E5F6A7B8-C9D0-1234-EF12-345678901234}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Resources", "Resources", "{7E1BAAD0-93E4-45FB-8017-7FC1A2A3E550}"
-	ProjectSection(SolutionItems) = preProject
-		Resources\BUILD.md = Resources\BUILD.md
-		Resources\CONTRIBUTING.md = Resources\CONTRIBUTING.md
-		Resources\DISTRIBUTION.md = Resources\DISTRIBUTION.md
-		Resources\IMPLEMENTATION-SUMMARY.md = Resources\IMPLEMENTATION-SUMMARY.md
-		Resources\INDEX.md = Resources\INDEX.md
-		Resources\QUICKSTART.md = Resources\QUICKSTART.md
-		Resources\README.md = Resources\README.md
-		Resources\VISUAL-STUDIO-DEVELOPMENT.md = Resources\VISUAL-STUDIO-DEVELOPMENT.md
-		Resources\COMPLETE-BUILD-SOLUTION.md = Resources\COMPLETE-BUILD-SOLUTION.md
-		Resources\QUICK-INSTALL-CARD.txt = Resources\QUICK-INSTALL-CARD.txt
-		Resources\USER-INSTALLATION-GUIDE.md = Resources\USER-INSTALLATION-GUIDE.md
-		Resources\POST-INSTALL-INFO.txt = Resources\POST-INSTALL-INFO.txt
-		Resources\INSTALLATION-INFO.txt = Resources\INSTALLATION-INFO.txt
-		Resources\VISUAL-STUDIO-DEVELOPMENT.md = Resources\VISUAL-STUDIO-DEVELOPMENT.md
-		Resources\VISUAL-STUDIO-DEVELOPMENT.md = Resources\VISUAL-STUDIO-DEVELOPMENT.md
-		Resources\VISUAL-STUDIO-DEVELOPMENT.md = Resources\VISUAL-STUDIO-DEVELOPMENT.md
-		Resources\VISUAL-STUDIO-DEVELOPMENT.md = Resources\VISUAL-STUDIO-DEVELOPMENT.md
-	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
