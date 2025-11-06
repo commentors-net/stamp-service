@@ -40,6 +40,9 @@ artifacts/
 dist/
 publish/
 *.zip
+nupkgs/
+*.nupkg
+*.snupkg
 
 # Key files and sensitive data
 *.key

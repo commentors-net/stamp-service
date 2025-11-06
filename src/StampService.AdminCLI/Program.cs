@@ -97,6 +97,19 @@ class Program
         uninstallCommand.SetHandler(async () => await HandleUninstallServiceAsync());
         rootCommand.AddCommand(uninstallCommand);
 
+        // Delete-key command
+        var deleteKeyCommand = new Command("delete-key", "Delete the master key (DANGEROUS - requires backup shares!)");
+        var confirmOption = new Option<bool>(
+            aliases: new[] { "--confirm", "-y" },
+            description: "Confirm key deletion (required)",
+     getDefaultValue: () => false);
+        deleteKeyCommand.AddOption(confirmOption);
+        deleteKeyCommand.SetHandler(async (bool confirm) =>
+   {
+            await HandleDeleteKeyAsync(confirm);
+        }, confirmOption);
+        rootCommand.AddCommand(deleteKeyCommand);
+
         return await rootCommand.InvokeAsync(args);
     }
 
@@ -571,31 +584,126 @@ class Program
         }
     }
 
-    static bool IsAdministrator()
+    static async Task HandleDeleteKeyAsync(bool confirm)
     {
-        if (OperatingSystem.IsWindows())
+    try
         {
-            using var identity = WindowsIdentity.GetCurrent();
-            var principal = new WindowsPrincipal(identity);
-            return principal.IsInRole(WindowsBuiltInRole.Administrator);
-        }
-        return false;
-    }
+     Console.WriteLine();
+         Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("???????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????");
+    Console.WriteLine("???              WARNING           ???");
+    Console.WriteLine("???????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????");
+   Console.ResetColor();
+     Console.WriteLine();
+      Console.WriteLine("You are about to DELETE the master cryptographic key!");
+   Console.WriteLine();
+ Console.WriteLine("This operation:");
+            Console.WriteLine("  ? Permanently deletes the key from memory and storage");
+       Console.WriteLine("  ? Cannot be undone");
+            Console.WriteLine("  ? Makes signature verification impossible");
+ Console.WriteLine("  ? Requires valid backup shares to recover");
+       Console.WriteLine();
+        Console.ForegroundColor = ConsoleColor.Yellow;
+         Console.WriteLine("? Before proceeding, ensure you have:");
+          Console.ResetColor();
+    Console.WriteLine("  1. Created backup shares (create-shares command)");
+        Console.WriteLine("  2. Distributed shares to trusted custodians");
+         Console.WriteLine("  3. Verified each share (verify-share command)");
+            Console.WriteLine("  4. Documented who holds each share");
+         Console.WriteLine();
 
-    static async Task<T?> CallServiceMethodAsync<T>(string method, object parameters)
+ if (!confirm)
+            {
+   Console.ForegroundColor = ConsoleColor.Red;
+       Console.WriteLine("Key deletion NOT confirmed.");
+   Console.ResetColor();
+ Console.WriteLine();
+      Console.WriteLine("To delete the key, you must use the --confirm flag:");
+           Console.WriteLine("  StampService.AdminCLI.exe delete-key --confirm");
+       Console.WriteLine();
+     return;
+     }
+
+         // Additional confirmation prompt
+            Console.Write("Type 'DELETE' in capital letters to proceed: ");
+     var userInput = Console.ReadLine();
+
+  if (userInput != "DELETE")
+       {
+       Console.ForegroundColor = ConsoleColor.Yellow;
+Console.WriteLine();
+                Console.WriteLine("? Key deletion cancelled.");
+            Console.ResetColor();
+         return;
+ }
+
+      Console.WriteLine();
+  Console.WriteLine("Sending delete request to service...");
+
+            var result = await CallServiceMethodAsync<DeleteKeyResult>("DeleteKey", new
+   {
+         confirmDeletion = true
+            });
+
+  if (result == null || !result.Success)
+      {
+  Console.ForegroundColor = ConsoleColor.Red;
+   Console.WriteLine($"? Failed to delete key: {result?.Message ?? "Unknown error"}");
+         Console.ResetColor();
+    return;
+      }
+
+    Console.WriteLine();
+ Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("? Master key successfully deleted");
+      Console.ResetColor();
+ Console.WriteLine();
+     Console.WriteLine("The service is now in keyless state.");
+      Console.WriteLine();
+            Console.WriteLine("Next steps:");
+Console.WriteLine("  ? To recover: Use 'recover start' and provide shares");
+     Console.WriteLine("  ? To create new key: Restart the service (it will generate a new key)");
+ Console.WriteLine();
+        }
+    catch (Exception ex)
+        {
+    Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine($"Error: {ex.Message}");
+            Console.ResetColor();
+        }
+  }
+
+ static async Task<T?> CallServiceMethodAsync<T>(string method, object parameters)
     {
-        using var client = new StampServiceClient();
+ using var client = new StampServiceClient();
         
-        // Use reflection to access the private SendRequestAsync method
+     // Use reflection to access the private SendRequestAsync method
         var methodInfo = typeof(StampServiceClient).GetMethod("SendRequestAsync",
             System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
         
         if (methodInfo == null)
-            throw new InvalidOperationException("Could not access service method");
+ throw new InvalidOperationException("Could not access service method");
 
-        var task = (Task<string>)methodInfo.Invoke(client, new object[] { method, parameters })!;
+      var task = (Task<string>)methodInfo.Invoke(client, new object[] { method, parameters })!;
         var response = await task;
-        
+  
         return JsonSerializer.Deserialize<T>(response);
     }
+
+    static bool IsAdministrator()
+    {
+        if (OperatingSystem.IsWindows())
+        {
+      using var identity = WindowsIdentity.GetCurrent();
+            var principal = new WindowsPrincipal(identity);
+        return principal.IsInRole(WindowsBuiltInRole.Administrator);
+        }
+        return false;
+    }
+}
+
+public class DeleteKeyResult
+{
+    public bool Success { get; set; }
+    public string Message { get; set; } = string.Empty;
 }

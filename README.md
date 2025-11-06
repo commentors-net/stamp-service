@@ -1,139 +1,293 @@
-# Secure Stamp Service
+﻿# Secure Stamp Service
 
 > A local, HSM-like signing authority implemented as a Windows Service (.NET 8)
 
-## Quick Links
+[![.NET 8](https://img.shields.io/badge/.NET-8.0-512BD4)](https://dotnet.microsoft.com/)
+[![Windows](https://img.shields.io/badge/Windows-Service-0078D6)](https://docs.microsoft.com/windows/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-This is the main README for the Secure Stamp Service. All detailed documentation is organized in the **Resources** folder.
+**Generates and holds a master private key inside a secure process, never exposes the key, supports Shamir Secret Sharing backups, and provides a secure local API for Windows client apps to request cryptographic signatures.**
 
-### ?? Documentation
+---
 
-- **[Complete README](Resources/README.md)** - Full technical documentation and architecture
-- **[Quick Start Guide](Resources/QUICKSTART.md)** - Get up and running in 5 minutes
-- **[Visual Studio Development Guide](Resources/VISUAL-STUDIO-DEVELOPMENT.md)** - Development and debugging using Visual Studio
-- **[Build Guide](Resources/BUILD.md)** - Building and distribution instructions
-- **[Implementation Summary](Resources/IMPLEMENTATION-SUMMARY.md)** - What has been built
-- **[Distribution Guide](Resources/DISTRIBUTION.md)** - Deployment and distribution
-- **[Contributing Guide](Resources/CONTRIBUTING.md)** - How to contribute
+## 🎯 What Is This?
 
-## What is This?
+A Windows service that acts like a **hardware security module (HSM)**:
 
-The Secure Stamp Service is a Windows service that acts as a secure signing authority (like an HSM) for cryptographic operations:
+- 🔐 Master signing key generated once and stored securely (never exported)
+- ✍️ Client apps submit requests → service returns cryptographic signatures
+- 💾 Master key backups via **Shamir's Secret Sharing** (distributed to custodians)
+- 🔄 Key recovery from threshold shares (e.g., 3 of 5 needed)
 
-- ? **Secure Key Storage** - Master key never exposed, stored with Windows DPAPI
-- ? **Ed25519 Signatures** - Fast, secure cryptographic signing
-- ? **Shamir Secret Sharing** - Distributed backup and recovery
-- ? **Local IPC** - Named Pipes for secure local communication
-- ? **Audit Logging** - Comprehensive logging of all operations
-- ? **Windows Service** - Runs automatically on system startup
+**Use Cases**: Token minting, approval workflows, multi-signature systems, audit trails, cryptographic stamping
 
-## Quick Start
+---
 
-### For Users (Installation)
+## 📚 Documentation
 
-1. Extract the distribution package
-2. Open PowerShell as Administrator
-3. Run: `.\Scripts\Install-StampService.ps1`
-4. Create backup shares: `.\AdminCLI\StampService.AdminCLI.exe create-shares --total 5 --threshold 3`
+> **All documentation is in the [Resources](Resources/) folder** • [View Index](Resources/INDEX.md)
 
-See **[Quick Start Guide](Resources/QUICKSTART.md)** for detailed instructions.
+### Quick Links
 
-### For Developers
+| Getting Started | Development | Integration |
+|----------------|-------------|-------------|
+| [Quick Start](Resources/QUICKSTART.md) | [Visual Studio](Resources/VISUAL-STUDIO-DEVELOPMENT.md) | [Client Integration](Resources/CLIENT-INTEGRATION.md) |
+| [Installation](Resources/USER-INSTALLATION-GUIDE.md) | [Build Guide](Resources/BUILD.md) | [Code Examples](examples/CLIENT-EXAMPLES.md) |
+| [Distribution](Resources/DISTRIBUTION.md) | [Contributing](Resources/CONTRIBUTING.md) | [NuGet Publishing](Resources/NUGET-PUBLISHING.md) |
 
-1. Open `StampService.sln` in Visual Studio 2022/2023
-2. Set `StampService` as startup project
-3. Press F5 to debug (runs in console mode)
+[**→ Complete Documentation Index**](Resources/INDEX.md)
 
-See **[Visual Studio Development Guide](Resources/VISUAL-STUDIO-DEVELOPMENT.md)** for detailed instructions.
+---
 
-## Project Structure
+## ⚡ Quick Start
 
-```
-Stamp-Service/
-??? src/
-?   ??? StampService/  # Windows Service (Main Entry Point)
-?   ??? StampService.Core/      # Business Logic
-?   ??? StampService.ClientLib/ # Client Library
-?   ??? StampService.AdminCLI/  # Admin Tool
-?   ??? StampService.Tests/     # Test Suite
-??? scripts/             # Installation & Build Scripts
-??? Resources/      # ?? All Documentation
-??? StampService.sln       # Visual Studio Solution
+### Install the Service
+
+```powershell
+# Extract distribution ZIP and run as Administrator
+cd ExtractedFolder\Scripts
+.\Install-StampService.ps1
+
+# Verify and test
+Get-Service SecureStampService
+cd ..\AdminCLI
+.\StampService.AdminCLI.exe status
+.\StampService.AdminCLI.exe test-stamp
+
+# Create backup shares (CRITICAL!)
+.\StampService.AdminCLI.exe create-shares --total 5 --threshold 3 --output C:\Shares
 ```
 
-## Key Features
+[**→ Full Installation Guide**](Resources/QUICKSTART.md)
 
-### Security
-- Private key generated and stored securely (Windows DPAPI)
-- Never exported or exposed
-- Shamir Secret Sharing for backup/recovery (configurable threshold)
-- Named Pipes for local-only communication
-- Comprehensive audit logging
+### Build from Source
 
-### Cryptography
-- **Algorithm**: Ed25519 (EdDSA)
-- **Key Size**: 256 bits
-- **Signature Size**: 512 bits
-- **Performance**: ~1-2ms per signature
+```powershell
+# Simple build
+.\build.bat
 
-### Operations
-The service can sign any operation type:
-- `mint` - Create new tokens/assets
-- `burn` - Destroy tokens
-- `freeze` - Freeze accounts
-- `move` - Transfer operations
-- Or any custom operation name
+# Or manual
+dotnet restore
+dotnet build -c Release
+dotnet test
 
-## Components
+# Or Visual Studio
+# Open StampService.sln, Press F5
+```
+
+[**→ Build Guide**](Resources/BUILD.md) | [**→ Visual Studio Guide**](Resources/VISUAL-STUDIO-DEVELOPMENT.md)
+
+### Integrate in Your App
+
+```powershell
+dotnet add package StampService.ClientLib --version 1.0.0
+```
+
+```csharp
+using StampService.ClientLib;
+
+var client = new StampServiceClient();
+var request = new SignRequest
+{
+ Operation = "mint",
+  RequesterId = "MyApp",
+    Payload = new Dictionary<string, object>
+    {
+        ["recipient"] = "user123",
+["amount"] = 1000
+    }
+};
+
+var response = await client.SignAsync(request);
+bool isValid = client.VerifySignature(response);
+```
+
+[**→ Integration Guide**](Resources/CLIENT-INTEGRATION.md) | [**→ Code Examples**](examples/CLIENT-EXAMPLES.md)
+
+---
+
+## 🏗️ Architecture
+
+```
+Client Apps → Named Pipes → Windows Service → DPAPI-encrypted Key
+      ↓
+        Audit Logging
+     ↓
+        Shamir Shares (Offline Backup)
+```
+
+### Components
 
 | Component | Type | Purpose |
 |-----------|------|---------|
 | **StampService** | Windows Service | Main service executable |
-| **StampService.Core** | Class Library | Business logic and crypto |
-| **StampService.ClientLib** | Class Library | Client integration library |
-| **StampService.AdminCLI** | Console App | Administration tool |
-| **StampService.Tests** | Test Project | Comprehensive test suite |
+| **StampService.Core** | Library | Business logic, crypto, SSS |
+| **StampService.ClientLib** | Library | Client integration (NuGet) |
+| **StampService.AdminCLI** | Tool | Administration CLI |
 
-## Documentation Index
-
-### Getting Started
-- [Quick Start Guide](Resources/QUICKSTART.md) - Installation and first use
-- [Visual Studio Development](Resources/VISUAL-STUDIO-DEVELOPMENT.md) - Development setup and debugging
-
-### Technical Documentation
-- [Complete README](Resources/README.md) - Full technical documentation
-- [Implementation Summary](Resources/IMPLEMENTATION-SUMMARY.md) - Architecture and components
-- [Build Guide](Resources/BUILD.md) - Build and distribution
-
-### Deployment
-- [Distribution Guide](Resources/DISTRIBUTION.md) - Deployment procedures
-- [Contributing Guide](Resources/CONTRIBUTING.md) - Contribution guidelines
-
-## Requirements
-
-### For End Users
-- Windows 10/11 or Windows Server 2019+
-- .NET 8 Runtime (included in distribution)
-- Administrator privileges for installation
-
-### For Developers
-- Windows 10/11 or Windows Server
-- .NET 8 SDK
-- Visual Studio 2022/2023
-- Git (optional)
-
-## Support
-
-- **Documentation**: See [Resources](Resources/) folder
-- **Issues**: Check GitHub Issues
-- **Logs**: `C:\ProgramData\StampService\Logs\`
-
-## License
-
-See LICENSE file for details.
+[**→ Technical Details**](Resources/README.md)
 
 ---
 
-**Security Note**: The private key NEVER leaves the service. It cannot be exported or viewed. The only way to backup/recover the key is through Shamir Secret Sharing.
+## ✨ Features
 
-**For detailed documentation, see the [Resources](Resources/) folder.**
+### Security
+- Windows DPAPI encryption • Shamir Secret Sharing backup • Named Pipes (local-only)
+- Comprehensive audit logging • Private key never exported
+
+### Cryptography
+- **Algorithm**: Ed25519 (EdDSA)
+- **Performance**: ~1-2ms per signature
+- **Provider**: BouncyCastle
+
+### Operations
+Sign any operation: `mint`, `burn`, `freeze`, `move`, `approve`, or custom
+
+---
+
+## 🔐 Backup & Recovery
+
+### Create Shares
+```powershell
+.\StampService.AdminCLI.exe create-shares --total 5 --threshold 3 --output C:\Shares
+# Distribute to 5 custodians, need 3 to recover
+```
+
+### Recover Key
+```powershell
+.\Install-StampService.ps1  # On new machine
+.\StampService.AdminCLI.exe recover start --threshold 3
+.\StampService.AdminCLI.exe recover add-share share-1-of-5.json
+.\StampService.AdminCLI.exe recover add-share share-3-of-5.json
+.\StampService.AdminCLI.exe recover add-share share-5-of-5.json
+# Key automatically reconstructed
+```
+
+[**→ Full Recovery Guide**](Resources/QUICKSTART.md#key-recovery-process)
+
+---
+
+## 🛠️ Administration
+
+```powershell
+# Service management
+Get-Service SecureStampService
+Start-Service SecureStampService
+Restart-Service SecureStampService
+
+# CLI commands
+.\StampService.AdminCLI.exe status
+.\StampService.AdminCLI.exe test-stamp
+.\StampService.AdminCLI.exe create-shares --total 5 --threshold 3
+.\StampService.AdminCLI.exe verify-share share-1-of-5.json
+.\StampService.AdminCLI.exe recover start --threshold 3
+
+# View logs
+Get-Content "C:\ProgramData\StampService\Logs\service*.log" -Tail 50
+Get-Content "C:\ProgramData\StampService\Logs\audit*.log" -Tail 50
+```
+
+---
+
+## 🔧 Requirements
+
+**End Users**: Windows 10/11 or Server 2019+ • .NET 8 Runtime (included) • Administrator privileges
+
+**Developers**: Windows 10/11 or Server • .NET 8 SDK • Visual Studio 2022/2023 or VS Code
+
+---
+
+## 📈 Performance
+
+- **Signing**: ~1-2ms (Ed25519)
+- **Throughput**: ~500-1000 signatures/sec (single-threaded)
+- **Memory**: ~50-100 MB
+- **Size**: ~50 MB installation
+
+---
+
+## 🚨 Security Notes
+
+**CRITICAL**:
+- 🔴 Private key NEVER leaves the service
+- 🔴 Create backup shares immediately after installation
+- 🔴 Distribute shares to 5+ trusted custodians (offline storage)
+- 🔴 Test recovery process before production
+- 🔴 Monitor audit logs regularly
+
+**Best Practices**:
+- Run under dedicated service account
+- Store shares in physical safes or encrypted offline storage
+- Set up daily health checks
+- Never store all shares together
+
+[**→ Security Guide**](Resources/DISTRIBUTION.md)
+
+---
+
+## 🤝 Contributing
+
+Contributions welcome! See [Contributing Guide](Resources/CONTRIBUTING.md)
+
+- 🐛 Report bugs via GitHub Issues
+- 💡 Suggest features via GitHub Discussions
+- 🔀 Submit PRs
+
+---
+
+## 📞 Support
+
+- 📚 [Documentation Index](Resources/INDEX.md)
+- 🚀 [Quick Start](Resources/QUICKSTART.md)
+- 💻 [Developer Guide](Resources/VISUAL-STUDIO-DEVELOPMENT.md)
+- 🔍 Logs: `C:\ProgramData\StampService\Logs\`
+
+---
+
+## 📝 License
+
+MIT License - see [LICENSE](LICENSE) file
+
+---
+
+## 🎯 Next Steps
+
+**New Users** → [Quick Start](Resources/QUICKSTART.md) → Install → Create shares
+
+**Developers** → [Visual Studio Guide](Resources/VISUAL-STUDIO-DEVELOPMENT.md) → Clone → F5
+
+**Integrators** → [Integration Guide](Resources/CLIENT-INTEGRATION.md) → NuGet → Code
+
+---
+
+**Built for secure cryptographic operations on Windows**
+
+[View Complete Documentation →](Resources/INDEX.md)
+
+---
+
+# File Structure
+
+```
+Secure-Stamp-Service/
+├── README.md              # Concise professional entry point
+├── LICENSE
+├── CONTRIBUTING.md → (link to Resources/CONTRIBUTING.md)
+│
+├── Resources/             # Professional documentation (12 files)
+│   ├── INDEX.md
+│   ├── README.md
+│   ├── QUICKSTART.md
+│   ├── USER-INSTALLATION-GUIDE.md
+│   ├── VISUAL-STUDIO-DEVELOPMENT.md
+│   ├── BUILD.md
+│   ├── CLIENT-INTEGRATION.md
+│   ├── INTEGRATION-CHECKLIST.md
+│   ├── DISTRIBUTION.md
+│   ├── NUGET-PUBLISHING.md
+│   ├── NUGET-QUICK-REF.md
+│   └── CONTRIBUTING.md
+│
+├── src/                   # Source code
+├── scripts/               # Automation scripts
+└── examples/              # Code examples (to be created)

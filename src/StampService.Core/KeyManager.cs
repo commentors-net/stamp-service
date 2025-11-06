@@ -195,6 +195,81 @@ public class KeyManager : IDisposable
         }
     }
 
+    /// <summary>
+    /// Delete the key from memory and storage
+    /// WARNING: This operation is irreversible! Ensure backup shares exist before calling.
+    /// </summary>
+    /// <param name="confirmDeletion">Must be set to true to confirm deletion</param>
+    public void DeleteKey(bool confirmDeletion = false)
+    {
+        if (!confirmDeletion)
+        {
+   throw new InvalidOperationException(
+         "Key deletion must be explicitly confirmed by setting confirmDeletion parameter to true");
+        }
+
+        lock (_keyLock)
+      {
+            try
+      {
+          // Clear keys from memory first
+   if (_privateKey != null)
+        {
+  Array.Clear(_privateKey, 0, _privateKey.Length);
+ _privateKey = null;
+  }
+
+       if (_publicKey != null)
+    {
+        Array.Clear(_publicKey, 0, _publicKey.Length);
+         _publicKey = null;
+       }
+
+    // Delete key file if it exists
+         if (File.Exists(_keyStorePath))
+         {
+                  // Overwrite file with random data before deletion (defense in depth)
+        var fileInfo = new FileInfo(_keyStorePath);
+        var fileSize = fileInfo.Length;
+ 
+   using (var fs = new FileStream(_keyStorePath, FileMode.Open, FileAccess.Write))
+         {
+  var random = new byte[fileSize];
+           RandomNumberGenerator.Fill(random);
+           fs.Write(random, 0, random.Length);
+        fs.Flush();
+             Array.Clear(random, 0, random.Length);
+          }
+
+      // Delete the file
+              File.Delete(_keyStorePath);
+
+         _auditLogger.LogSecurityEvent("KeyDeleted", 
+"Master key permanently deleted from storage (CRITICAL)");
+       }
+         else
+ {
+      _auditLogger.LogSecurityEvent("KeyDeleteAttempt", 
+        "Key deletion requested but no key file found");
+              }
+            }
+            catch (Exception ex)
+       {
+       _auditLogger.LogSecurityEvent("KeyDeletionFailed", 
+        $"Failed to delete key: {ex.Message}");
+      throw new InvalidOperationException("Failed to delete key securely", ex);
+    }
+        }
+    }
+
+    /// <summary>
+    /// Check if key file exists on disk
+    /// </summary>
+    public bool KeyFileExists()
+    {
+        return File.Exists(_keyStorePath);
+    }
+
     private void SaveKeySecurely()
     {
         try

@@ -167,6 +167,7 @@ public class IPCServer : IDisposable
                 "RecoverStart" => HandleRecoverStart(paramsElement),
                 "RecoverProvideShare" => HandleRecoverProvideShare(paramsElement),
                 "RecoverStatus" => HandleRecoverStatus(),
+                "DeleteKey" => HandleDeleteKey(paramsElement),
                 _ => JsonSerializer.Serialize(new { error = "Unknown method" })
             };
         }
@@ -403,6 +404,56 @@ public class IPCServer : IDisposable
                 ? $"Recovery in progress. {_recoveryShares.Count}/{_recoveryThreshold} shares provided."
                 : "No active recovery."
         });
+    }
+
+    private string HandleDeleteKey(JsonElement paramsElement)
+    {
+        try
+        {
+            // Parse confirmation parameter
+            var confirmDeletion = paramsElement.TryGetProperty("confirmDeletion", out var confirm) 
+                && confirm.GetBoolean();
+
+            if (!confirmDeletion)
+            {
+                return JsonSerializer.Serialize(new
+                {
+                    Success = false,
+                    Message = "Key deletion must be explicitly confirmed"
+                });
+            }
+
+            // Check if key exists
+            if (!_keyManager.HasKey && !_keyManager.KeyFileExists())
+            {
+                return JsonSerializer.Serialize(new
+                {
+                    Success = false,
+                    Message = "No key exists to delete"
+                });
+            }
+
+            // Perform deletion
+            _keyManager.DeleteKey(confirmDeletion: true);
+
+            _auditLogger.LogSecurityEvent("KeyDeleted", 
+                "Master key permanently deleted via AdminCLI (CRITICAL)");
+
+            return JsonSerializer.Serialize(new
+            {
+                Success = true,
+                Message = "Master key successfully deleted. Service is now in keyless state."
+            });
+        }
+        catch (Exception ex)
+        {
+            _auditLogger.LogSecurityEvent("KeyDeletionFailed", $"Error: {ex.Message}");
+            return JsonSerializer.Serialize(new
+            {
+                Success = false,
+                Message = $"Key deletion failed: {ex.Message}"
+            });
+        }
     }
 
     private byte[] DerivePublicKeyFromPrivate(byte[] privateKey)

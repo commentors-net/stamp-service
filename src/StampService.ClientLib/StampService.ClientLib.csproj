@@ -5,6 +5,24 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <LangVersion>latest</LangVersion>
+    
+    <!-- NuGet Package Metadata -->
+    <PackageId>StampService.ClientLib</PackageId>
+    <Title>Secure Stamp Service Client Library</Title>
+    <Description>Client library for integrating with the Secure Stamp Service - an HSM-like signing authority for Windows.</Description>
+    <Authors>Your Organization</Authors>
+    <Company>Your Organization</Company>
+    <Product>Secure Stamp Service</Product>
+    <Copyright>Copyright © 2025 Your Organization</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/commentors-net/stamp-service</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/commentors-net/stamp-service</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>cryptography;signing;hsm;ed25519;windows-service;security</PackageTags>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
 
   <ItemGroup>
@@ -13,6 +31,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\StampService.Core\StampService.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" />
   </ItemGroup>
 
 </Project>
