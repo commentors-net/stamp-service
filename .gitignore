@@ -39,6 +39,7 @@ artifacts/
 # Distribution
 dist/
 publish/
+packages/
 *.zip
 nupkgs/
 *.nupkg

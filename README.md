@@ -90,12 +90,12 @@ var client = new StampServiceClient();
 var request = new SignRequest
 {
  Operation = "mint",
-  RequesterId = "MyApp",
+    RequesterId = "MyApp",
     Payload = new Dictionary<string, object>
     {
         ["recipient"] = "user123",
-["amount"] = 1000
-    }
+      ["amount"] = 1000
+ }
 };
 
 var response = await client.SignAsync(request);
@@ -110,10 +110,10 @@ bool isValid = client.VerifySignature(response);
 
 ```
 Client Apps → Named Pipes → Windows Service → DPAPI-encrypted Key
-      ↓
-        Audit Logging
+    ↓
+          Audit Logging
      ↓
-        Shamir Shares (Offline Backup)
+     Shamir Shares (Offline Backup)
 ```
 
 ### Components
@@ -263,31 +263,3 @@ MIT License - see [LICENSE](LICENSE) file
 **Built for secure cryptographic operations on Windows**
 
 [View Complete Documentation →](Resources/INDEX.md)
-
----
-
-# File Structure
-
-```
-Secure-Stamp-Service/
-├── README.md              # Concise professional entry point
-├── LICENSE
-├── CONTRIBUTING.md → (link to Resources/CONTRIBUTING.md)
-│
-├── Resources/             # Professional documentation (12 files)
-│   ├── INDEX.md
-│   ├── README.md
-│   ├── QUICKSTART.md
-│   ├── USER-INSTALLATION-GUIDE.md
-│   ├── VISUAL-STUDIO-DEVELOPMENT.md
-│   ├── BUILD.md
-│   ├── CLIENT-INTEGRATION.md
-│   ├── INTEGRATION-CHECKLIST.md
-│   ├── DISTRIBUTION.md
-│   ├── NUGET-PUBLISHING.md
-│   ├── NUGET-QUICK-REF.md
-│   └── CONTRIBUTING.md
-│
-├── src/                   # Source code
-├── scripts/               # Automation scripts
-└── examples/              # Code examples (to be created)
