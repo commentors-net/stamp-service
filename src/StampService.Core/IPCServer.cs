@@ -17,6 +17,7 @@ public class IPCServer : IDisposable
     private readonly string _pipeName;
     private readonly KeyManager _keyManager;
     private readonly SSSManager _sssManager;
+    private readonly SecretManager _secretManager;
     private readonly IAuditLogger _auditLogger;
     private readonly CancellationTokenSource _cancellationTokenSource;
     private readonly List<Task> _clientTasks = new();
@@ -33,6 +34,7 @@ public class IPCServer : IDisposable
         _pipeName = pipeName;
         _keyManager = keyManager;
         _sssManager = sssManager;
+        _secretManager = new SecretManager(auditLogger);
         _auditLogger = auditLogger;
         _cancellationTokenSource = new CancellationTokenSource();
         _startTime = DateTime.UtcNow;
@@ -149,27 +151,32 @@ public class IPCServer : IDisposable
 
     private async Task<string> ProcessRequestAsync(string requestJson)
     {
-        try
-        {
-            using var doc = JsonDocument.Parse(requestJson);
-            var root = doc.RootElement;
-            
-            var method = root.GetProperty("method").GetString();
-            var paramsElement = root.TryGetProperty("params", out var p) ? p : default;
+     try
+     {
+ using var doc = JsonDocument.Parse(requestJson);
+     var root = doc.RootElement;
+       
+        var method = root.GetProperty("method").GetString();
+       var paramsElement = root.TryGetProperty("params", out var p) ? p : default;
 
-            return method switch
-            {
-                "Sign" => HandleSign(paramsElement),
-                "TestStamp" => HandleTestStamp(),
-                "GetStatus" => HandleGetStatus(),
-                "CreateShares" => HandleCreateShares(paramsElement),
-                "VerifyShare" => HandleVerifyShare(paramsElement),
-                "RecoverStart" => HandleRecoverStart(paramsElement),
-                "RecoverProvideShare" => HandleRecoverProvideShare(paramsElement),
-                "RecoverStatus" => HandleRecoverStatus(),
-                "DeleteKey" => HandleDeleteKey(paramsElement),
-                _ => JsonSerializer.Serialize(new { error = "Unknown method" })
-            };
+    return method switch
+    {
+        "Sign" => HandleSign(paramsElement),
+        "TestStamp" => HandleTestStamp(),
+        "GetStatus" => HandleGetStatus(),
+        "CreateShares" => HandleCreateShares(paramsElement),
+        "VerifyShare" => HandleVerifyShare(paramsElement),
+        "RecoverStart" => HandleRecoverStart(paramsElement),
+        "RecoverProvideShare" => HandleRecoverProvideShare(paramsElement),
+        "RecoverStatus" => HandleRecoverStatus(),
+        "DeleteKey" => HandleDeleteKey(paramsElement),
+        "StoreSecret" => HandleStoreSecret(paramsElement),
+        "RetrieveSecret" => HandleRetrieveSecret(paramsElement),
+        "ListSecrets" => HandleListSecrets(),
+        "DeleteSecret" => HandleDeleteSecret(paramsElement),
+        "SecretExists" => HandleSecretExists(paramsElement),
+        _ => JsonSerializer.Serialize(new { error = "Unknown method" })
+    };
         }
         catch (Exception ex)
         {
@@ -456,12 +463,141 @@ public class IPCServer : IDisposable
         }
     }
 
+    private string HandleStoreSecret(JsonElement paramsElement)
+    {
+        try
+        {
+            var name = paramsElement.GetProperty("name").GetString();
+      var value = paramsElement.GetProperty("value").GetString();
+
+   if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(value))
+ return JsonSerializer.Serialize(new { error = "Name and value are required" });
+
+    // Optional metadata
+ Dictionary<string, string>? metadata = null;
+          if (paramsElement.TryGetProperty("metadata", out var metadataElement))
+ {
+     metadata = JsonSerializer.Deserialize<Dictionary<string, string>>(metadataElement.GetRawText());
+        }
+
+      _secretManager.StoreSecret(name, value, metadata);
+
+    return JsonSerializer.Serialize(new
+  {
+     success = true,
+         message = $"Secret '{name}' stored successfully"
+ });
+        }
+        catch (Exception ex)
+        {
+            return JsonSerializer.Serialize(new { error = ex.Message });
+        }
+    }
+
+    private string HandleRetrieveSecret(JsonElement paramsElement)
+    {
+        try
+        {
+            var name = paramsElement.GetProperty("name").GetString();
+
+            if (string.IsNullOrEmpty(name))
+                return JsonSerializer.Serialize(new { error = "Name is required" });
+
+            var result = _secretManager.RetrieveSecret(name);
+
+            if (result == null)
+                return JsonSerializer.Serialize(new { error = $"Secret '{name}' not found" });
+
+            return JsonSerializer.Serialize(new
+            {
+                success = true,
+                name = name,
+                value = result.Value.value,
+                createdAt = result.Value.createdAt,
+                metadata = result.Value.metadata
+            });
+        }
+        catch (Exception ex)
+        {
+            return JsonSerializer.Serialize(new { error = ex.Message });
+        }
+    }
+
+    private string HandleListSecrets()
+    {
+        try
+        {
+            var secrets = _secretManager.ListSecrets();
+
+            return JsonSerializer.Serialize(new
+            {
+                success = true,
+                secrets = secrets,
+                count = secrets.Count
+            });
+        }
+        catch (Exception ex)
+        {
+            return JsonSerializer.Serialize(new { error = ex.Message });
+        }
+    }
+
+    private string HandleDeleteSecret(JsonElement paramsElement)
+    {
+        try
+        {
+            var name = paramsElement.GetProperty("name").GetString();
+
+            if (string.IsNullOrEmpty(name))
+                return JsonSerializer.Serialize(new { error = "Name is required" });
+
+            var deleted = _secretManager.DeleteSecret(name);
+
+            if (!deleted)
+                return JsonSerializer.Serialize(new { error = $"Secret '{name}' not found" });
+
+            return JsonSerializer.Serialize(new
+            {
+                success = true,
+                message = $"Secret '{name}' deleted successfully"
+            });
+        }
+        catch (Exception ex)
+        {
+            return JsonSerializer.Serialize(new { error = ex.Message });
+        }
+    }
+
+    private string HandleSecretExists(JsonElement paramsElement)
+    {
+        try
+        {
+            var name = paramsElement.GetProperty("name").GetString();
+
+            if (string.IsNullOrEmpty(name))
+                return JsonSerializer.Serialize(new { error = "Name is required" });
+
+            var exists = _secretManager.SecretExists(name);
+
+            return JsonSerializer.Serialize(new
+            {
+                success = true,
+                name = name,
+                exists = exists
+            });
+        }
+        catch (Exception ex)
+        {
+            return JsonSerializer.Serialize(new { error = ex.Message });
+        }
+    }
+
     private byte[] DerivePublicKeyFromPrivate(byte[] privateKey)
     {
         // For Ed25519, the public key can be derived from private key
-        // The private key in Ed25519 is 32 bytes, and we can generate the public key from it
-        var privateKeyParams = new Org.BouncyCastle.Crypto.Parameters.Ed25519PrivateKeyParameters(privateKey, 0);
-        var publicKeyParams = privateKeyParams.GeneratePublicKey();
+      // The private key in Ed25519 is 32 bytes, and we can generate the public key from it
+     var privateKeyParams = new Org.BouncyCastle.Crypto.Parameters.Ed25519PrivateKeyParameters(privateKey, 0);
+  var publicKeyParams = privateKeyParams.GeneratePublicKey();
         return publicKeyParams.GetEncoded();
     }
 
@@ -475,6 +611,7 @@ public class IPCServer : IDisposable
     public void Dispose()
     {
         Stop();
+        _secretManager?.Dispose();
         _cancellationTokenSource.Dispose();
     }
 }

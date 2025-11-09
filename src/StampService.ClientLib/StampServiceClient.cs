@@ -77,6 +77,84 @@ public class StampServiceClient : IDisposable
     }
 
     /// <summary>
+    /// Store a secret securely in the service
+    /// </summary>
+    public async Task<bool> StoreSecretAsync(string name, string value, Dictionary<string, string>? metadata = null)
+    {
+        var parameters = new
+        {
+            name = name,
+            value = value,
+            metadata = metadata
+        };
+
+        var response = await SendRequestAsync("StoreSecret", parameters);
+        var result = JsonSerializer.Deserialize<JsonElement>(response);
+        return result.TryGetProperty("success", out var success) && success.GetBoolean();
+    }
+
+    /// <summary>
+    /// Retrieve a secret from the service
+    /// </summary>
+    public async Task<(string value, DateTime createdAt, Dictionary<string, string> metadata)?> RetrieveSecretAsync(string name)
+    {
+        var parameters = new { name = name };
+        var response = await SendRequestAsync("RetrieveSecret", parameters);
+        var result = JsonSerializer.Deserialize<JsonElement>(response);
+
+        if (!result.TryGetProperty("success", out var success) || !success.GetBoolean())
+            return null;
+
+        var value = result.GetProperty("value").GetString() ?? string.Empty;
+        var createdAt = result.GetProperty("createdAt").GetDateTime();
+        var metadata = JsonSerializer.Deserialize<Dictionary<string, string>>(
+            result.GetProperty("metadata").GetRawText()) ?? new Dictionary<string, string>();
+
+        return (value, createdAt, metadata);
+    }
+
+    /// <summary>
+    /// List all stored secrets (names only)
+    /// </summary>
+    public async Task<List<string>> ListSecretsAsync()
+    {
+        var response = await SendRequestAsync("ListSecrets", new { });
+        var result = JsonSerializer.Deserialize<JsonElement>(response);
+
+        if (!result.TryGetProperty("success", out var success) || !success.GetBoolean())
+            return new List<string>();
+
+        return JsonSerializer.Deserialize<List<string>>(result.GetProperty("secrets").GetRawText()) 
+            ?? new List<string>();
+    }
+
+    /// <summary>
+    /// Delete a secret
+    /// </summary>
+    public async Task<bool> DeleteSecretAsync(string name)
+    {
+        var parameters = new { name = name };
+        var response = await SendRequestAsync("DeleteSecret", parameters);
+        var result = JsonSerializer.Deserialize<JsonElement>(response);
+        return result.TryGetProperty("success", out var success) && success.GetBoolean();
+    }
+
+    /// <summary>
+    /// Check if a secret exists
+    /// </summary>
+    public async Task<bool> SecretExistsAsync(string name)
+    {
+        var parameters = new { name = name };
+        var response = await SendRequestAsync("SecretExists", parameters);
+        var result = JsonSerializer.Deserialize<JsonElement>(response);
+   
+        if (!result.TryGetProperty("success", out var success) || !success.GetBoolean())
+            return false;
+
+        return result.TryGetProperty("exists", out var exists) && exists.GetBoolean();
+    }
+
+    /// <summary>
     /// Send a generic request to the service
     /// </summary>
     private async Task<string> SendRequestAsync(string method, object parameters)
