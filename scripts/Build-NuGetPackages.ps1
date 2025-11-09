@@ -3,10 +3,10 @@
 
 param(
     [Parameter(Mandatory=$false)]
-    [ValidateSet('Debug', 'Release')]
+  [ValidateSet('Debug', 'Release')]
     [string]$Configuration = 'Release',
-    
-    [Parameter(Mandatory=$false)]
+
+  [Parameter(Mandatory=$false)]
     [string]$OutputPath = ".\nupkgs",
     
     [Parameter(Mandatory=$false)]
@@ -21,6 +21,12 @@ param(
 
 $ErrorActionPreference = "Stop"
 
+# Check if running as administrator (only if we need to stop service)
+function Test-Administrator {
+    $currentPrincipal = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())
+    return $currentPrincipal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+}
+
 Write-Host "===============================================" -ForegroundColor Cyan
 Write-Host "   Secure Stamp Service - NuGet Packager     " -ForegroundColor Cyan
 Write-Host "===============================================" -ForegroundColor Cyan
@@ -29,18 +35,18 @@ Write-Host ""
 # Determine version
 if ([string]::IsNullOrEmpty($Version)) {
     # Try to get version from git tag
-try {
+    try {
         $gitTag = git describe --tags --abbrev=0 2>&1
         if ($LASTEXITCODE -eq 0 -and $gitTag -match "^v?(\d+\.\d+\.\d+)") {
-      $Version = $Matches[1]
-       Write-Host "Using version from git tag: $Version" -ForegroundColor Green
+        $Version = $Matches[1]
+         Write-Host "Using version from git tag: $Version" -ForegroundColor Green
         } else {
-            throw "No valid git tag found"
+       throw "No valid git tag found"
         }
     } catch {
         $Version = "1.0.0"
         Write-Host "No git tag found, using default version: $Version" -ForegroundColor Yellow
-    Write-Host "  (Create a tag with: git tag v1.0.0)" -ForegroundColor DarkGray
+Write-Host "  (Create a tag with: git tag v1.0.0)" -ForegroundColor DarkGray
     }
 } else {
     Write-Host "Using specified version: $Version" -ForegroundColor Green
@@ -60,29 +66,67 @@ if (-not $SkipBuild) {
     Write-Host ""
     Write-Host "[2/4] Building solution..." -ForegroundColor Yellow
   
-    # Stop service if running to avoid file locks
+    # Check if service is running and stop it if we have admin rights
     $serviceName = "SecureStampService"
     $service = Get-Service $serviceName -ErrorAction SilentlyContinue
-    if ($service -and $service.Status -eq 'Running') {
-        Write-Host "  Stopping $serviceName..." -ForegroundColor Yellow
-        Stop-Service $serviceName
-        Start-Sleep -Seconds 2
-}
+    $serviceWasRunning = $false
     
-    dotnet clean -c $Configuration
-    dotnet restore
+ if ($service -and $service.Status -eq 'Running') {
+        if (Test-Administrator) {
+   Write-Host "  Stopping $serviceName..." -ForegroundColor Yellow
+            try {
+      Stop-Service $serviceName -Force -ErrorAction Stop
+            Start-Sleep -Seconds 2
+    $serviceWasRunning = $true
+           Write-Host "  Service stopped" -ForegroundColor Green
+            }
+  catch {
+          Write-Host "  WARNING: Could not stop service: $($_.Exception.Message)" -ForegroundColor Yellow
+                Write-Host "  Continuing anyway - build may fail if files are locked" -ForegroundColor Yellow
+      }
+     }
+      else {
+       Write-Host "  WARNING: Service is running but script not run as Administrator" -ForegroundColor Yellow
+     Write-Host "  Build may fail if service files are locked" -ForegroundColor Yellow
+            Write-Host "  Tip: Run as Administrator or stop service manually" -ForegroundColor DarkGray
+  }
+    }
+    
+    # Clean and build
+    Write-Host "  Cleaning..." -ForegroundColor Cyan
+    dotnet clean -c $Configuration --verbosity quiet
+    
+    Write-Host "  Restoring packages..." -ForegroundColor Cyan
+    dotnet restore --verbosity quiet
+    
+    Write-Host "  Building..." -ForegroundColor Cyan
     dotnet build -c $Configuration --no-restore /p:Version=$Version
     
     if ($LASTEXITCODE -ne 0) {
-        Write-Host "ERROR: Build failed" -ForegroundColor Red
+  Write-Host "ERROR: Build failed" -ForegroundColor Red
+        
+        # Restart service if we stopped it
+      if ($serviceWasRunning -and (Test-Administrator)) {
+          Write-Host "  Restarting $serviceName..." -ForegroundColor Yellow
+Start-Service $serviceName -ErrorAction SilentlyContinue
+        }
+        
         exit 1
     }
-    Write-Host "  Build successful" -ForegroundColor Green
+ Write-Host "  Build successful" -ForegroundColor Green
     
-    # Restart service if it was running
-    if ($service -and $service.Status -eq 'Stopped') {
-        Write-Host "  Starting $serviceName..." -ForegroundColor Yellow
-Start-Service $serviceName
+    # Restart service if it was running and we stopped it
+ if ($serviceWasRunning -and (Test-Administrator)) {
+  Write-Host "  Starting $serviceName..." -ForegroundColor Yellow
+        try {
+Start-Service $serviceName -ErrorAction Stop
+      Start-Sleep -Seconds 2
+   Write-Host "  Service restarted" -ForegroundColor Green
+    }
+        catch {
+            Write-Host "  WARNING: Could not restart service: $($_.Exception.Message)" -ForegroundColor Yellow
+            Write-Host "  You may need to start it manually: Start-Service $serviceName" -ForegroundColor Yellow
+        }
     }
 } else {
     Write-Host ""
@@ -115,7 +159,7 @@ foreach ($project in $projects) {
     
     if ($LASTEXITCODE -ne 0) {
         Write-Host "ERROR: Failed to pack $project" -ForegroundColor Red
-    exit 1
+        exit 1
     }
 }
 
@@ -170,7 +214,7 @@ OPTION 1: Local Folder (Simplest for private use)
      
      dotnet nuget add source C:\MyNuGetPackages --name LocalPackages
      
-  3. Install in your project:
+3. Install in your project:
   
      dotnet add package StampService.ClientLib --version $Version
 
@@ -179,9 +223,9 @@ OPTION 2: Network Share (For team use)
   1. Copy packages to network share (e.g., \\server\share\nuget)
   2. Add as source:
   
-     dotnet nuget add source \\server\share\nuget --name CompanyPackages
+   dotnet nuget add source \\server\share\nuget --name CompanyPackages
      
-  3. Install normally
+3. Install normally
 
 OPTION 3: Azure Artifacts (For enterprise use)
 
@@ -189,9 +233,9 @@ OPTION 3: Azure Artifacts (For enterprise use)
   2. Push packages:
      
      dotnet nuget push StampService.Core.$Version.nupkg \
-       --source "AzureArtifacts" \
+   --source "AzureArtifacts" \
        --api-key az
-       
+     
   3. Configure authentication in NuGet.config
   4. Install normally
 
@@ -212,7 +256,7 @@ QUICK START (LOCAL USE):
 
 1. Add local NuGet source:
 
-   dotnet nuget add source $((Get-Item $OutputPath).FullName) --name StampServiceLocal
+ dotnet nuget add source $((Get-Item $OutputPath).FullName) --name StampServiceLocal
 
 2. In your client project:
 
@@ -235,10 +279,11 @@ $packageInfo | Out-File -FilePath (Join-Path $OutputPath "PACKAGE-INFO.txt") -En
 
 Write-Host ""
 Write-Host "===============================================" -ForegroundColor Cyan
-Write-Host "Packaging Complete!                " -ForegroundColor Cyan
+Write-Host "      Packaging Complete!      " -ForegroundColor Cyan
 Write-Host "===============================================" -ForegroundColor Cyan
 Write-Host ""
 Write-Host "Packages location: $OutputPath" -ForegroundColor White
+Write-Host "Package version: $Version" -ForegroundColor White
 Write-Host ""
 Write-Host "Next steps:" -ForegroundColor Yellow
 Write-Host "  1. Review PACKAGE-INFO.txt for usage options" -ForegroundColor White

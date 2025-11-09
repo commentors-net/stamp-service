@@ -87,6 +87,9 @@ public class StampServiceClient : IDisposable
         var cts = new CancellationTokenSource(_timeoutMs);
         await pipeClient.ConnectAsync(cts.Token);
 
+        // CRITICAL FIX: Set ReadMode to Message to match server
+        pipeClient.ReadMode = PipeTransmissionMode.Message;
+
         // Prepare request
         var request = new
         {

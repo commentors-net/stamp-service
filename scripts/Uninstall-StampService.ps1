@@ -61,7 +61,7 @@ Write-Host "[3/3] Cleaning up..." -ForegroundColor Yellow
 if ($RemoveData) {
     Write-Host ""
     Write-Host "WARNING: You are about to delete all service data including:" -ForegroundColor Red
-    Write-Host "  - Master key files" -ForegroundColor Red
+    Write-Host "  - Master key (in Registry)" -ForegroundColor Red
     Write-Host "  - Audit logs" -ForegroundColor Red
     Write-Host "  - Configuration" -ForegroundColor Red
     Write-Host ""
@@ -69,12 +69,21 @@ if ($RemoveData) {
     $Confirm = Read-Host "Type 'DELETE' to confirm data removal"
     
     if ($Confirm -eq "DELETE") {
+        # Remove Registry key
+        $RegPath = "HKLM:\SOFTWARE\StampService"
+        if (Test-Path $RegPath) {
+            Remove-Item -Path $RegPath -Recurse -Force
+            Write-Host "  Registry key removed: $RegPath" -ForegroundColor Green
+        }
+        
+        # Remove data directory (logs, etc.)
         $DataPath = "C:\ProgramData\StampService"
         if (Test-Path $DataPath) {
             Remove-Item -Path $DataPath -Recurse -Force
             Write-Host "  Data directory removed: $DataPath" -ForegroundColor Green
         }
         
+        # Remove installation directory
         $InstallPath = "C:\Program Files\StampService"
         if (Test-Path $InstallPath) {
             Remove-Item -Path $InstallPath -Recurse -Force
@@ -85,10 +94,11 @@ if ($RemoveData) {
     }
 } else {
     Write-Host "  Data preserved (use -RemoveData to delete)" -ForegroundColor Yellow
+    Write-Host "  Note: Master key is stored in Registry at HKLM:\SOFTWARE\StampService" -ForegroundColor Cyan
 }
 
 Write-Host ""
 Write-Host "===============================================" -ForegroundColor Cyan
-Write-Host "        Uninstallation Complete!               " -ForegroundColor Cyan
+Write-Host "   Uninstallation Complete!     " -ForegroundColor Cyan
 Write-Host "===============================================" -ForegroundColor Cyan
 Write-Host ""
