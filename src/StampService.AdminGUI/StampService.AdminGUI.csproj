@@ -1,0 +1,47 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <AssemblyName>StampService.AdminGUI</AssemblyName>
+    <Product>Stamp Service Manager</Product>
+    <Description>Beautiful GUI for managing Stamp Service - create tokens, manage secrets, backup &amp; recovery</Description>
+    <Version>1.0.0</Version>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Material Design for beautiful UI -->
+    <PackageReference Include="MaterialDesignThemes" Version="5.0.0" />
+    <PackageReference Include="MaterialDesignColors" Version="3.0.0" />
+    
+    <!-- MVVM Toolkit for clean architecture -->
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
+    
+    <!-- Blockchain libraries -->
+    <PackageReference Include="Nethereum.HdWallet" Version="4.19.0" />
+    <PackageReference Include="NBitcoin" Version="7.0.36" />
+    
+    <!-- Folder picker -->
+    <PackageReference Include="Ookii.Dialogs.Wpf" Version="5.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Reference our existing libraries -->
+    <ProjectReference Include="..\StampService.ClientLib\StampService.ClientLib.csproj" />
+    <ProjectReference Include="..\StampService.Core\StampService.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Views\" />
+    <Folder Include="ViewModels\" />
+    <Folder Include="Wizards\" />
+    <Folder Include="Services\" />
+    <Folder Include="Resources\" />
+    <Folder Include="Helpers\" />
+  </ItemGroup>
+
+</Project>

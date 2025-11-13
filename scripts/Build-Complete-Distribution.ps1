@@ -1,283 +1,278 @@
-# Build Complete Distribution with Installer
-# This script builds the solution and creates a single-file installer
+# Build Complete Distribution Package
+# Creates a professional distribution package with installer and ZIP
 
 param(
-    [Parameter(Mandatory=$false)]
-    [ValidateSet('Debug', 'Release')]
-    [string]$Configuration = 'Release',
-    
-    [Parameter(Mandatory=$false)]
-    [string]$OutputPath = ".\dist",
-    
-    [Parameter(Mandatory=$false)]
-    [switch]$SkipTests,
-    
-    [Parameter(Mandatory=$false)]
-    [switch]$SkipInstaller,
-    
-    [Parameter(Mandatory=$false)]
-    [string]$InnoSetupPath = "C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
+    [string]$Configuration = "Release",
+    [string]$Version = "1.0.0",
+    [switch]$IncludeAdminGUI = $true
 )
 
 $ErrorActionPreference = "Stop"
 
-Write-Host "???????????????????????????????????????????????" -ForegroundColor Cyan
-Write-Host "  Secure Stamp Service - Complete Build Script  " -ForegroundColor Cyan
-Write-Host "???????????????????????????????????????????????" -ForegroundColor Cyan
+Write-Host "========================================" -ForegroundColor Cyan
+Write-Host "  Stamp Service - Complete Distribution" -ForegroundColor Cyan
+Write-Host "========================================" -ForegroundColor Cyan
+Write-Host ""
+Write-Host "Configuration: $Configuration" -ForegroundColor White
+Write-Host "Version: $Version" -ForegroundColor White
+Write-Host "Include AdminGUI: $IncludeAdminGUI" -ForegroundColor White
 Write-Host ""
 
-# Step 1: Run the standard build
-Write-Host "[1/6] Running standard build process..." -ForegroundColor Yellow
-$buildParams = @{
-    Configuration = $Configuration
-OutputPath = $OutputPath
-}
-if ($SkipTests) {
-    $buildParams['SkipTests'] = $true
-}
+# Get directories
+$ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+$RootDir = Split-Path -Parent $ScriptDir
+$DistDir = Join-Path $RootDir "dist"
 
-& "$PSScriptRoot\Build-Distribution.ps1" @buildParams
+# Create distribution directory
+if (Test-Path $DistDir) {
+    Write-Host "Cleaning previous distribution..." -ForegroundColor Cyan
+    Remove-Item -Path $DistDir -Recurse -Force
+}
+New-Item -ItemType Directory -Path $DistDir -Force | Out-Null
+Write-Host "? Distribution directory created" -ForegroundColor Green
+Write-Host ""
+
+# Build StampService
+Write-Host "========================================" -ForegroundColor Cyan
+Write-Host "Building StampService..." -ForegroundColor Cyan
+Write-Host "========================================" -ForegroundColor Cyan
+Write-Host ""
+
+$ServiceProject = Join-Path $RootDir "src\StampService\StampService.csproj"
+& dotnet publish $ServiceProject -c $Configuration -o (Join-Path $DistDir "StampService") -p:Version=$Version
 
 if ($LASTEXITCODE -ne 0) {
-    Write-Host "ERROR: Build-Distribution.ps1 failed" -ForegroundColor Red
- exit 1
+    Write-Host "? StampService build failed!" -ForegroundColor Red
+    exit 1
+}
+Write-Host "? StampService built successfully" -ForegroundColor Green
+Write-Host ""
+
+# Build AdminCLI
+Write-Host "========================================" -ForegroundColor Cyan
+Write-Host "Building AdminCLI..." -ForegroundColor Cyan
+Write-Host "========================================" -ForegroundColor Cyan
+Write-Host ""
+
+$AdminCLIProject = Join-Path $RootDir "src\StampService.AdminCLI\StampService.AdminCLI.csproj"
+& dotnet publish $AdminCLIProject -c $Configuration -o (Join-Path $DistDir "AdminCLI") -p:Version=$Version
+
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "? AdminCLI build failed!" -ForegroundColor Red
+    exit 1
+}
+Write-Host "? AdminCLI built successfully" -ForegroundColor Green
+Write-Host ""
+
+# Build AdminGUI (if requested)
+if ($IncludeAdminGUI) {
+    Write-Host "========================================" -ForegroundColor Cyan
+    Write-Host "Building AdminGUI..." -ForegroundColor Cyan
+    Write-Host "========================================" -ForegroundColor Cyan
+    Write-Host ""
+
+    $AdminGUIProject = Join-Path $RootDir "src\StampService.AdminGUI\StampService.AdminGUI.csproj"
+    & dotnet publish $AdminGUIProject -c $Configuration -o (Join-Path $DistDir "AdminGUI") -p:Version=$Version
+
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "? AdminGUI build failed!" -ForegroundColor Red
+        exit 1
+    }
+    Write-Host "? AdminGUI built successfully" -ForegroundColor Green
+    Write-Host ""
 }
 
-Write-Host ""
-Write-Host "[2/6] Standard build complete" -ForegroundColor Green
+# Copy scripts
+Write-Host "Copying scripts..." -ForegroundColor Cyan
+$ScriptsDestDir = Join-Path $DistDir "Scripts"
+New-Item -ItemType Directory -Path $ScriptsDestDir -Force | Out-Null
 
-# Step 2: Check if Inno Setup is installed
-Write-Host ""
-Write-Host "[3/6] Checking for Inno Setup..." -ForegroundColor Yellow
+$ScriptFiles = @(
+    "Install-StampService.ps1",
+    "Uninstall-StampService.ps1",
+    "Complete-Uninstaller.ps1"
+)
 
-if (-not (Test-Path $InnoSetupPath)) {
-    Write-Host "  WARNING: Inno Setup not found at: $InnoSetupPath" -ForegroundColor Yellow
-    Write-Host ""
-    Write-Host "  To create a single-file installer, please:" -ForegroundColor Yellow
-    Write-Host "    1. Download Inno Setup from: https://jrsoftware.org/isdl.php" -ForegroundColor White
-    Write-Host "    2. Install Inno Setup (default location recommended)" -ForegroundColor White
-    Write-Host "    3. Run this script again" -ForegroundColor White
-    Write-Host ""
-    
-    if (-not $SkipInstaller) {
-        $response = Read-Host "  Do you want to continue without creating installer? (y/n)"
-        if ($response -ne 'y') {
-            exit 1
-        }
-        $SkipInstaller = $true
- }
+foreach ($Script in $ScriptFiles) {
+    $SourcePath = Join-Path $ScriptDir $Script
+    if (Test-Path $SourcePath) {
+        Copy-Item -Path $SourcePath -Destination $ScriptsDestDir -Force
+        Write-Host "? Copied: $Script" -ForegroundColor Green
+    }
+    else {
+        Write-Host "  ??  Skipped: $Script (not found)" -ForegroundColor Yellow
+    }
+}
+Write-Host "? Scripts copied" -ForegroundColor Green
+Write-Host ""
+
+# Copy documentation
+Write-Host "Copying documentation..." -ForegroundColor Cyan
+$DocsDestDir = Join-Path $DistDir "Documentation"
+New-Item -ItemType Directory -Path $DocsDestDir -Force | Out-Null
+
+$DocFiles = @(
+    "README.md",
+    "Resources\QUICKSTART.md",
+    "Resources\DISTRIBUTION.md",
+    "Resources\CLIENT-INTEGRATION.md",
+    "Resources\USER-INSTALLATION-GUIDE.md"
+)
+
+if ($IncludeAdminGUI) {
+    $DocFiles += @(
+        "Resources\ADMINGUI-COMPLETE-SUMMARY.md",
+        "Resources\POLISH-QUICK-REF.md"
+    )
 }
 
-# Step 3: Create LICENSE.txt if it doesn't exist
-Write-Host ""
-Write-Host "[4/6] Preparing installer resources..." -ForegroundColor Yellow
-
-$licensePath = Join-Path $PSScriptRoot "..\LICENSE.txt"
-if (-not (Test-Path $licensePath)) {
-    @"
-MIT License
-
-Copyright (c) 2025 Your Organization
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-"@ | Out-File -FilePath $licensePath -Encoding UTF8
-    Write-Host "  Created LICENSE.txt" -ForegroundColor Green
+foreach ($Doc in $DocFiles) {
+    $SourcePath = Join-Path $RootDir $Doc
+    if (Test-Path $SourcePath) {
+  $FileName = Split-Path -Leaf $SourcePath
+    Copy-Item -Path $SourcePath -Destination (Join-Path $DocsDestDir $FileName) -Force
+    }
 }
+Write-Host "? Documentation copied" -ForegroundColor Green
+Write-Host ""
 
-Write-Host "  Resources ready" -ForegroundColor Green
+# Create version info
+Write-Host "Creating version info..." -ForegroundColor Cyan
+$VersionInfo = @{
+    Version = $Version
+    Configuration = $Configuration
+    BuildDate = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss")
+ Components = @{
+        StampService = $true
+        AdminCLI = $true
+     AdminGUI = $IncludeAdminGUI
+    }
+} | ConvertTo-Json -Depth 10
 
-# Step 4: Build installer
-if (-not $SkipInstaller -and (Test-Path $InnoSetupPath)) {
+$VersionInfo | Set-Content (Join-Path $DistDir "version.json")
+Write-Host "? Version info created" -ForegroundColor Green
+Write-Host ""
+
+# Create ZIP package
+Write-Host "========================================" -ForegroundColor Cyan
+Write-Host "Creating ZIP distribution..." -ForegroundColor Cyan
+Write-Host "========================================" -ForegroundColor Cyan
+Write-Host ""
+
+$Timestamp = Get-Date -Format "yyyyMMdd-HHmmss"
+$ZipName = "StampService-Distribution-$Version-$Timestamp.zip"
+$ZipPath = Join-Path $RootDir $ZipName
+
+Compress-Archive -Path "$DistDir\*" -DestinationPath $ZipPath -CompressionLevel Optimal -Force
+
+$ZipSize = [math]::Round(((Get-Item $ZipPath).Length / 1MB), 2)
+Write-Host "? ZIP created: $ZipName" -ForegroundColor Green
+Write-Host "? Size: $ZipSize MB" -ForegroundColor Green
+Write-Host ""
+
+# Build AdminGUI installer (if requested and Inno Setup available)
+if ($IncludeAdminGUI) {
+    Write-Host "========================================" -ForegroundColor Cyan
+    Write-Host "Building Unified Installer..." -ForegroundColor Cyan
+    Write-Host "========================================" -ForegroundColor Cyan
     Write-Host ""
-    Write-Host "[5/6] Building single-file installer..." -ForegroundColor Yellow
+
+ $InnoSetupPath = "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe"
+    if (Test-Path $InnoSetupPath) {
+      $InstallerScript = Join-Path $ScriptDir "Complete-Installer.iss"
+        if (Test-Path $InstallerScript) {
+            try {
+      Write-Host "Updating version in installer script..." -ForegroundColor Cyan
+    $ScriptContent = Get-Content $InstallerScript -Raw
+    $ScriptContent = $ScriptContent -replace '#define MyAppVersion ".*"', "#define MyAppVersion `"$Version`""
+    Set-Content -Path $InstallerScript -Value $ScriptContent -NoNewline
     
-    $issFile = Join-Path $PSScriptRoot "StampService-Installer.iss"
- 
-    & $InnoSetupPath $issFile
+                Write-Host "Compiling installer with Inno Setup..." -ForegroundColor Cyan
+     Write-Host "  Compiler: $InnoSetupPath" -ForegroundColor Gray
+            Write-Host "  Script: $InstallerScript" -ForegroundColor Gray
+          Write-Host ""
     
-    if ($LASTEXITCODE -eq 0) {
-        Write-Host "Installer created successfully" -ForegroundColor Green
-   
-    # Find the created installer
-        $installerFile = Get-ChildItem -Path (Split-Path $PSScriptRoot) -Filter "StampService-Setup-*.exe" | 
-        Sort-Object LastWriteTime -Descending | 
-     Select-Object -First 1
+  $InnoArgs = @("/Q", $InstallerScript)
+             & $InnoSetupPath @InnoArgs
         
-        if ($installerFile) {
-    $installerSize = [math]::Round($installerFile.Length / 1MB, 2)
-            Write-Host "  Installer file: $($installerFile.Name) ($installerSize MB)" -ForegroundColor White
-   }
- } else {
-        Write-Host "  WARNING: Installer build failed" -ForegroundColor Yellow
-}
-} else {
-    Write-Host ""
-    Write-Host "[5/6] Skipping installer creation" -ForegroundColor Yellow
-}
-
-# Step 5: Create summary
-Write-Host ""
-Write-Host "[6/6] Creating build summary..." -ForegroundColor Yellow
-
-$summaryPath = Join-Path (Split-Path $PSScriptRoot) "BUILD-SUMMARY.txt"
-$summary = @"
-???????????????????????????????????????????????????????????????????
-  Secure Stamp Service - Build Summary
-???????????????????????????????????????????????????????????????????
-
-Build Date: $(Get-Date -Format "yyyy-MM-dd HH:mm:ss")
-Configuration: $Configuration
-Build Script: Build-Complete-Distribution.ps1
-
-DISTRIBUTION PACKAGE:
-  Location: $OutputPath
-  ZIP File: $(Get-ChildItem -Path (Split-Path $PSScriptRoot) -Filter "StampService-Distribution-*.zip" | Select-Object -Last 1 -ExpandProperty Name)
-
-SINGLE-FILE INSTALLER:
-"@
-
-$installerFile = Get-ChildItem -Path (Split-Path $PSScriptRoot) -Filter "StampService-Setup-*.exe" -ErrorAction SilentlyContinue | 
-    Sort-Object LastWriteTime -Descending | 
-       Select-Object -First 1
-
-if ($installerFile) {
-    $installerSize = [math]::Round($installerFile.Length / 1MB, 2)
-    $summary += @"
-
-  Status: ? Created
-  File: $($installerFile.Name)
-  Size: $installerSize MB
-  
-  This is a single executable file that can be distributed to end users.
-  Non-technical users simply run this file and follow the wizard.
-
-"@
-} else {
-$summary += @"
-
-  Status: ? Not Created
-  Reason: $(if ($SkipInstaller) { "Skipped by user" } else { "Inno Setup not found" })
-  
-  To create a single-file installer:
-    1. Install Inno Setup from https://jrsoftware.org/isdl.php
-2. Run this script again
-
-"@
+      if ($LASTEXITCODE -eq 0) {
+          Write-Host "? Unified installer created successfully!" -ForegroundColor Green
+          }
+    else {
+        Write-Host "??  Installer build returned code: $LASTEXITCODE" -ForegroundColor Yellow
+            }
+            }
+ catch {
+       Write-Host "??  Unified installer build failed (non-critical): $($_.Exception.Message)" -ForegroundColor Yellow
+         }
+        }
+        else {
+            Write-Host "??  Installer script not found: $InstallerScript" -ForegroundColor Yellow
+        }
+    }
+    else {
+   Write-Host "??  Inno Setup not installed - Skipping unified installer" -ForegroundColor Gray
+        Write-Host "   Install from: https://jrsoftware.org/isdl.php" -ForegroundColor Gray
+    }
+ Write-Host ""
 }
 
-$summary += @"
-
-???????????????????????????????????????????????????????????????????
-DISTRIBUTION METHODS:
-???????????????????????????????????????????????????????????????????
-
-METHOD 1: Single-File Installer (RECOMMENDED for non-technical users)
-  
-  1. Distribute: StampService-Setup-X.X.X.exe
-  2. User runs the .exe file
-  3. Installer wizard guides through installation
-  4. Service is automatically installed and started
-  5. User is prompted to create backup shares
-
-  Advantages:
-    ? Single file to distribute
-    ? Automatic service installation
-    ? Guided post-installation steps
-    ? Professional installer experience
-    ? Automatic uninstaller
-
-METHOD 2: ZIP Package (For technical users / manual installation)
-  
-  1. Distribute: StampService-Distribution-YYYYMMDD-HHMMSS.zip
-  2. User extracts ZIP file
-  3. User opens PowerShell as Administrator
-  4. User runs: .\Scripts\Install-StampService.ps1
-  5. User manually creates backup shares
-
-  Advantages:
-    ? Full control over installation
-    ? Can customize installation paths
-    ? Can review files before installation
-    ? Scriptable deployment
-
-???????????????????????????????????????????????????????????????????
-NEXT STEPS:
-???????????????????????????????????????????????????????????????????
-
-FOR DEVELOPERS:
-  1. Test the installer on a clean VM
-  2. Verify service starts correctly
-  3. Test AdminCLI commands
-  4. Create test backup shares and verify recovery
-
-FOR DISTRIBUTION:
-  1. Sign the installer (optional but recommended):
-     signtool sign /f certificate.pfx /p password StampService-Setup-X.X.X.exe
-  
-  2. Create installation guide for end users:
-     - Download the installer
-     - Run as Administrator
-     - Follow the wizard
-     - Create backup shares when prompted
-  
-  3. Distribute the signed installer file to users
-
-???????????????????????????????????????????????????????????????????
-
-Build completed successfully!
-
-"@
-
-$summary | Out-File -FilePath $summaryPath -Encoding UTF8
-Write-Host "  Summary saved to BUILD-SUMMARY.txt" -ForegroundColor Green
-
-# Display summary
-Write-Host ""
-Write-Host "???????????????????????????????????????????????" -ForegroundColor Cyan
-Write-Host "            Build Complete!         " -ForegroundColor Cyan
-Write-Host "???????????????????????????????????????????????" -ForegroundColor Cyan
+# Summary
+Write-Host "========================================" -ForegroundColor Cyan
+Write-Host "  Distribution Build Complete!" -ForegroundColor Green
+Write-Host "========================================" -ForegroundColor Cyan
 Write-Host ""
 
-if ($installerFile) {
-    Write-Host "? Single-File Installer Created!" -ForegroundColor Green
-    Write-Host "  File: $($installerFile.FullName)" -ForegroundColor White
-    Write-Host "  Size: $installerSize MB" -ForegroundColor White
-    Write-Host ""
-Write-Host "  This installer can be distributed to end users." -ForegroundColor White
-    Write-Host "  They simply run the .exe and follow the wizard." -ForegroundColor White
-    Write-Host ""
-} else {
-    Write-Host "? ZIP Package Created" -ForegroundColor Yellow
-    Write-Host "  See BUILD-SUMMARY.txt for creating a single-file installer" -ForegroundColor White
+Write-Host "Package Details:" -ForegroundColor Cyan
+Write-Host "  Version: $Version" -ForegroundColor White
+Write-Host "  Configuration: $Configuration" -ForegroundColor White
+Write-Host "  Build Date: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')" -ForegroundColor White
 Write-Host ""
+
+Write-Host "Distribution Files:" -ForegroundColor Cyan
+Write-Host "  ZIP Package:" -ForegroundColor White
+Write-Host "    $ZipName" -ForegroundColor Gray
+Write-Host "    Size: $ZipSize MB" -ForegroundColor Gray
+Write-Host ""
+
+if ($IncludeAdminGUI) {
+    $InstallerPath = Join-Path $RootDir "StampService-Complete-Setup-$Version.exe"
+    if (Test-Path $InstallerPath) {
+        $InstallerSize = [math]::Round(((Get-Item $InstallerPath).Length / 1MB), 2)
+        Write-Host "  Unified Installer:" -ForegroundColor White
+Write-Host "    StampService-Complete-Setup-$Version.exe" -ForegroundColor Gray
+     Write-Host "    Size: $InstallerSize MB" -ForegroundColor Gray
+      Write-Host "    Includes: Service + AdminCLI + AdminGUI" -ForegroundColor Gray
+        Write-Host ""
+    }
 }
 
-Write-Host "Next steps:" -ForegroundColor Yellow
-Write-Host "  1. Review BUILD-SUMMARY.txt for distribution options" -ForegroundColor White
-Write-Host "  2. Test installation on a clean machine" -ForegroundColor White
-Write-Host "  3. (Optional) Sign the installer with your certificate" -ForegroundColor White
-Write-Host "  4. Distribute to end users" -ForegroundColor White
+Write-Host "Components:" -ForegroundColor Cyan
+Write-Host "  ? StampService (Windows Service)" -ForegroundColor White
+Write-Host "  ? AdminCLI (Command-line tool)" -ForegroundColor White
+if ($IncludeAdminGUI) {
+    Write-Host "  ? AdminGUI (Desktop application)" -ForegroundColor White
+}
+Write-Host "  ? Installation scripts" -ForegroundColor White
+Write-Host "  ? Documentation" -ForegroundColor White
 Write-Host ""
 
-# Open Windows Explorer to show output
-if ($installerFile) {
-    Write-Host "Opening output folder..." -ForegroundColor Cyan
- Start-Sleep -Seconds 2
-    explorer.exe "/select,$($installerFile.FullName)"
+Write-Host "Next Steps:" -ForegroundColor Cyan
+Write-Host "  1. Test installation on clean Windows machine" -ForegroundColor Yellow
+Write-Host "  2. Verify all components work correctly" -ForegroundColor Yellow
+Write-Host "  3. Test backup/recovery process" -ForegroundColor Yellow
+if ($IncludeAdminGUI) {
+    Write-Host "  4. Test AdminGUI installer and all features" -ForegroundColor Yellow
 }
+Write-Host ""
+
+Write-Host "Distribution Locations:" -ForegroundColor Cyan
+Write-Host "  Build artifacts: $DistDir" -ForegroundColor White
+Write-Host "  ZIP package: $ZipPath" -ForegroundColor White
+if ($IncludeAdminGUI -and (Test-Path (Join-Path $RootDir "StampService-Complete-Setup-$Version.exe"))) {
+    Write-Host "  Unified installer: $(Join-Path $RootDir "StampService-Complete-Setup-$Version.exe")" -ForegroundColor White
+}
+Write-Host ""
+
+Write-Host "? Build completed successfully!" -ForegroundColor Green
+Write-Host ""
