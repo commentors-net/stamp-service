@@ -16,7 +16,7 @@ param(
 $ErrorActionPreference = "Stop"
 
 Write-Host "===============================================" -ForegroundColor Cyan
-Write-Host "     Secure Stamp Service - Build Script      " -ForegroundColor Cyan
+Write-Host "     Secure Stamp Service - Build Script  " -ForegroundColor Cyan
 Write-Host "===============================================" -ForegroundColor Cyan
 Write-Host ""
 
@@ -42,7 +42,7 @@ Write-Host "[3/5] Building solution..." -ForegroundColor Yellow
 dotnet build -c $Configuration --no-restore
 if ($LASTEXITCODE -ne 0) {
     Write-Host "ERROR: Build failed" -ForegroundColor Red
-    exit 1
+exit 1
 }
 Write-Host "  Build successful" -ForegroundColor Green
 
@@ -55,13 +55,13 @@ if ($SkipTests) {
 } else {
     dotnet test -c $Configuration --no-build --verbosity normal --filter "FullyQualifiedName!~SSSManager_Should_Reconstruct&FullyQualifiedName!~KeyManager_Should_Load_Saved_Key"
     if ($LASTEXITCODE -ne 0) {
-    Write-Host "WARNING: Some tests failed" -ForegroundColor Yellow
-   Write-Host "Note: Known issues with SSS reconstruction tests (see BUILD.md)" -ForegroundColor Yellow
+  Write-Host "WARNING: Some tests failed" -ForegroundColor Yellow
+        Write-Host "Note: Known issues with SSS reconstruction tests (see BUILD.md)" -ForegroundColor Yellow
         $Continue = Read-Host "Continue with packaging? (y/n)"
-        if ($Continue -ne 'y') {
- exit 1
+  if ($Continue -ne 'y') {
+          exit 1
         }
-} else {
+ } else {
         Write-Host "  All tests passed" -ForegroundColor Green
     }
 }
@@ -74,8 +74,8 @@ Write-Host "[5/5] Publishing projects..." -ForegroundColor Yellow
 Write-Host "  Publishing StampService..." -ForegroundColor Cyan
 $ServicePublishPath = Join-Path $OutputPath "StampService"
 dotnet publish .\src\StampService\StampService.csproj `
-    -c $Configuration `
-    -r win-x64 `
+-c $Configuration `
+ -r win-x64 `
     --self-contained false `
     -o $ServicePublishPath `
     /p:PublishSingleFile=false
@@ -92,6 +92,17 @@ dotnet publish .\src\StampService.AdminCLI\StampService.AdminCLI.csproj `
     /p:PublishSingleFile=false
 Write-Host "    Done" -ForegroundColor Green
 
+# Publish AdminGUI
+Write-Host "  Publishing AdminGUI..." -ForegroundColor Cyan
+$AdminGUIPublishPath = Join-Path $OutputPath "AdminGUI"
+dotnet publish .\src\StampService.AdminGUI\StampService.AdminGUI.csproj `
+    -c $Configuration `
+    -r win-x64 `
+    --self-contained false `
+    -o $AdminGUIPublishPath `
+    /p:PublishSingleFile=false
+Write-Host "    Done" -ForegroundColor Green
+
 # Copy scripts
 Write-Host "  Copying installation scripts..." -ForegroundColor Cyan
 $ScriptsPath = Join-Path $OutputPath "Scripts"
@@ -105,7 +116,7 @@ Copy-Item -Path ".\Resources\README.md" -Destination $OutputPath -Force
 Copy-Item -Path ".\Resources\QUICKSTART.md" -Destination $OutputPath -Force
 Write-Host "    Done" -ForegroundColor Green
 
-# Create distribution README
+# Create distribution README (updated with AdminGUI)
 $DistReadme = @"
 # Secure Stamp Service - Distribution Package
 
@@ -113,6 +124,7 @@ $DistReadme = @"
 
 - **StampService/** - Windows Service executable and dependencies
 - **AdminCLI/** - Administration command-line tool
+- **AdminGUI/** - Administration GUI application (NEW!)
 - **Scripts/** - Installation and uninstallation PowerShell scripts
 - **README.md** - Full documentation
 
@@ -128,8 +140,19 @@ The installer will:
 - Copy files to C:\Program Files\StampService
 - Create data directory at C:\ProgramData\StampService
 - Install and start the Windows Service
+- Create desktop shortcut for AdminGUI
 
-### Verify Installation
+### Manage with GUI (Recommended)
+
+1. Double-click "Stamp Service Manager" on desktop
+2. Application requires administrator privileges (will prompt)
+3. Use the graphical interface to:
+   - Create tokens with automatic key generation
+   - Manage secrets (view, delete, recreate)
+   - Create and restore backups
+   - Monitor service health
+
+### Or Use Command Line
 
 ```powershell
 # Check service status
@@ -143,12 +166,18 @@ cd ..\AdminCLI
 
 ### Create Backup Shares
 
+**Option 1: Using GUI (Easy)**
+1. Open "Stamp Service Manager"
+2. Click "Backup & Recovery"
+3. Configure shares (default: 5 total, 3 threshold)
+4. Click "Create Backup Shares"
+5. Distribute shares to trusted custodians
+
+**Option 2: Using CLI**
 ```powershell
 cd ..\AdminCLI
 .\StampService.AdminCLI.exe create-shares --total 5 --threshold 3 --output C:\Shares
 ```
-
-Distribute the shares to trusted custodians for safekeeping.
 
 ### Uninstallation
 
@@ -193,6 +222,7 @@ Console.WriteLine($"Signature: {response.Signature}");
 - All operations are logged to C:\ProgramData\StampService\Logs\
 - Backup shares should be stored offline in secure locations
 - Require threshold shares (e.g., 3 of 5) for key recovery
+- AdminGUI requires administrator privileges
 
 ## Support
 
@@ -226,14 +256,22 @@ Write-Host "  Package created: $ZipPath" -ForegroundColor Green
 
 Write-Host ""
 Write-Host "===============================================" -ForegroundColor Cyan
-Write-Host "            Build Complete!                    " -ForegroundColor Cyan
+Write-Host "     Build Complete!   " -ForegroundColor Cyan
 Write-Host "===============================================" -ForegroundColor Cyan
 Write-Host ""
 Write-Host "Output directory: $OutputPath" -ForegroundColor White
 Write-Host "Distribution package: $ZipPath" -ForegroundColor White
 Write-Host ""
+Write-Host "Components included:" -ForegroundColor Yellow
+Write-Host "  ? StampService (Windows Service)" -ForegroundColor Green
+Write-Host "  ? AdminCLI (Command-line tool)" -ForegroundColor Green
+Write-Host "  ? AdminGUI (Graphical interface)" -ForegroundColor Green
+Write-Host "  ? Scripts (Installation/Uninstallation)" -ForegroundColor Green
+Write-Host "  ? Documentation" -ForegroundColor Green
+Write-Host ""
 Write-Host "Next steps:" -ForegroundColor Yellow
 Write-Host "  1. Test the installation on a clean machine" -ForegroundColor White
 Write-Host "  2. Distribute the ZIP file to users" -ForegroundColor White
 Write-Host "  3. Users should extract and run Scripts\Install-StampService.ps1" -ForegroundColor White
+Write-Host "  4. Users can manage via AdminGUI (desktop shortcut created)" -ForegroundColor White
 Write-Host ""

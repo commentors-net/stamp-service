@@ -67,3 +67,4 @@ appsettings.Local.json
 
 # VS Code
 .vscode/
+*.exe

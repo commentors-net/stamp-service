@@ -1,0 +1,194 @@
+<Window x:Class="StampService.AdminGUI.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:local="clr-namespace:StampService.AdminGUI"
+        mc:Ignorable="d"
+        Title="Stamp Service Manager"
+        Height="700" Width="1000"
+        WindowStartupLocation="CenterScreen"
+        Background="{DynamicResource MaterialDesignPaper}"
+        FontFamily="{materialDesign:MaterialDesignFont}"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        TextElement.FontWeight="Regular"
+        TextElement.FontSize="13"
+        TextOptions.TextFormattingMode="Ideal"
+        TextOptions.TextRenderingMode="Auto">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <materialDesign:ColorZone Grid.Row="0" Mode="PrimaryMid" Padding="16">
+            <DockPanel>
+                <StackPanel Orientation="Horizontal">
+                    <materialDesign:PackIcon Kind="ShieldKey" Width="32" Height="32" VerticalAlignment="Center" Margin="0,0,12,0"/>
+                    <TextBlock Text="Stamp Service Manager" FontSize="22" VerticalAlignment="Center" FontWeight="Medium"/>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" DockPanel.Dock="Right">
+                    <Button Style="{StaticResource MaterialDesignIconButton}" ToolTip="Help">
+                        <materialDesign:PackIcon Kind="HelpCircle"/>
+                    </Button>
+                    <Button Style="{StaticResource MaterialDesignIconButton}" ToolTip="Settings" Click="SettingsButton_Click">
+                        <materialDesign:PackIcon Kind="Settings"/>
+                    </Button>
+                </StackPanel>
+            </DockPanel>
+        </materialDesign:ColorZone>
+
+        <!-- Main Content -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <Grid Margin="24">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Quick Actions -->
+                <materialDesign:Card Grid.Row="0" Style="{StaticResource CardStyle}" materialDesign:ElevationAssist.Elevation="Dp4">
+                    <StackPanel>
+                        <TextBlock Text="Quick Actions" Style="{StaticResource SectionHeaderStyle}"/>
+
+                        <UniformGrid Rows="2" Columns="2" Margin="0,8,0,0">
+                            <!-- Create Token -->
+                            <Button Height="100" Margin="4" Click="CreateTokenButton_Click"
+                                    Style="{StaticResource MaterialDesignRaisedButton}"
+                                    materialDesign:ButtonAssist.CornerRadius="8"
+                                    ToolTip="Create a new token (Ctrl+N)">
+                                <StackPanel>
+                                    <materialDesign:PackIcon Kind="Plus" Width="32" Height="32" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="Create New Token" FontWeight="SemiBold" Margin="0,8,0,0"/>
+                                    <TextBlock Text="Generate keys and deploy" FontSize="11" Opacity="0.7"/>
+                                </StackPanel>
+                            </Button>
+
+                            <!-- Manage Secrets -->
+                            <Button Height="100" Margin="4" Click="ManageSecretsButton_Click"
+                                    Style="{StaticResource MaterialDesignRaisedButton}"
+                                    materialDesign:ButtonAssist.CornerRadius="8"
+                                    ToolTip="Manage stored secrets (Ctrl+M)">
+                                <StackPanel>
+                                    <materialDesign:PackIcon Kind="Key" Width="32" Height="32" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="Manage Secrets" FontWeight="SemiBold" Margin="0,8,0,0"/>
+                                    <TextBlock Text="Store and retrieve keys" FontSize="11" Opacity="0.7"/>
+                                </StackPanel>
+                            </Button>
+
+                            <!-- Backup & Recovery -->
+                            <Button Height="100" Margin="4" Click="BackupButton_Click"
+                                    Style="{StaticResource MaterialDesignRaisedButton}"
+                                    materialDesign:ButtonAssist.CornerRadius="8"
+                                    ToolTip="Backup and recovery (Ctrl+B)">
+                                <StackPanel>
+                                    <materialDesign:PackIcon Kind="CloudDownload" Width="32" Height="32" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="Backup and Recovery" FontWeight="SemiBold" Margin="0,8,0,0"/>
+                                    <TextBlock Text="Create and restore shares" FontSize="11" Opacity="0.7"/>
+                                </StackPanel>
+                            </Button>
+
+                            <!-- Service Health -->
+                            <Button Height="100" Margin="4" Click="HealthButton_Click"
+                                    Style="{StaticResource MaterialDesignRaisedButton}"
+                                    materialDesign:ButtonAssist.CornerRadius="8"
+                                    ToolTip="Service health monitoring (Ctrl+H)">
+                                <StackPanel>
+                                    <materialDesign:PackIcon Kind="HeartPulse" Width="32" Height="32" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="Service Health" FontWeight="SemiBold" Margin="0,8,0,0"/>
+                                    <TextBlock Text="Monitor and diagnose" FontSize="11" Opacity="0.7"/>
+                                </StackPanel>
+                            </Button>
+                        </UniformGrid>
+                    </StackPanel>
+                </materialDesign:Card>
+
+                <!-- Service Status -->
+                <materialDesign:Card Grid.Row="1" Style="{StaticResource CardStyle}" materialDesign:ElevationAssist.Elevation="Dp4">
+     <StackPanel>
+        <TextBlock Text="Service Status" Style="{StaticResource SectionHeaderStyle}"/>
+
+        <Grid Margin="0,8,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <!-- Status Indicator -->
+                            <materialDesign:PackIcon Grid.Row="0" Grid.Column="0" Kind="Circle" Foreground="Green"
+                                                     Width="12" Height="12" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                            <TextBlock Grid.Row="0" Grid.Column="1" x:Name="ServiceStatusText"
+                                       Text="Running" FontWeight="SemiBold" VerticalAlignment="Center"/>
+
+                            <!-- Uptime -->
+                            <materialDesign:PackIcon Grid.Row="1" Grid.Column="0" Kind="ClockOutline"
+                                                     Width="16" Height="16" VerticalAlignment="Center" Margin="0,8,8,0"/>
+                            <TextBlock Grid.Row="1" Grid.Column="1" x:Name="UptimeText"
+                                       Text="Uptime: Loading..." VerticalAlignment="Center" Margin="0,8,0,0"/>
+
+                            <!-- Master Key -->
+                            <materialDesign:PackIcon Grid.Row="2" Grid.Column="0" Kind="Key"
+                                                     Width="16" Height="16" VerticalAlignment="Center" Margin="0,8,8,0"/>
+                            <TextBlock Grid.Row="2" Grid.Column="1" x:Name="MasterKeyText"
+                                       Text="Master Key Present" VerticalAlignment="Center" Margin="0,8,0,0"/>
+
+                            <!-- Secrets -->
+                            <materialDesign:PackIcon Grid.Row="3" Grid.Column="0" Kind="ShieldLock"
+                                                     Width="16" Height="16" VerticalAlignment="Center" Margin="0,8,8,0"/>
+                            <TextBlock Grid.Row="3" Grid.Column="1" x:Name="SecretsText"
+                                       Text="Secrets Stored: Loading..." VerticalAlignment="Center" Margin="0,8,0,0"/>
+                        </Grid>
+                    </StackPanel>
+                </materialDesign:Card>
+
+                <!-- Recent Activity -->
+                <materialDesign:Card Grid.Row="2" Style="{StaticResource CardStyle}" materialDesign:ElevationAssist.Elevation="Dp4">
+                    <StackPanel>
+                        <TextBlock Text="Recent Activity" Style="{StaticResource SectionHeaderStyle}"/>
+
+                        <ListBox x:Name="RecentActivityList" MaxHeight="200" BorderThickness="0">
+                            <ListBoxItem>
+                                <StackPanel Orientation="Horizontal">
+                                    <materialDesign:PackIcon Kind="Circle" Width="8" Height="8" Foreground="Green"
+                                                             VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                    <TextBlock Text="Service started - 2 days ago" FontSize="12"/>
+                                </StackPanel>
+                            </ListBoxItem>
+                        </ListBox>
+                    </StackPanel>
+                </materialDesign:Card>
+            </Grid>
+        </ScrollViewer>
+
+        <!-- Footer -->
+        <materialDesign:ColorZone Grid.Row="2" Mode="PrimaryLight" Padding="12">
+            <DockPanel>
+                <TextBlock x:Name="PrivilegeStatusText" 
+ Text="Checking privileges..." 
+                 FontSize="11" 
+    Opacity="0.7" 
+        VerticalAlignment="Center"
+         Margin="0,0,16,0"/>
+                <TextBlock Text="v1.0.0" FontSize="11" Opacity="0.7" VerticalAlignment="Center"/>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" DockPanel.Dock="Right">
+                    <TextBlock Text="Ready" FontSize="11" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                    <ProgressBar Width="100" Height="4" IsIndeterminate="False" Value="100"/>
+                </StackPanel>
+            </DockPanel>
+        </materialDesign:ColorZone>
+    </Grid>
+</Window>
+
+
