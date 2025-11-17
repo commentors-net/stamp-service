@@ -49,6 +49,12 @@ public partial class MainWindow : Window
        CreateTokenButton_Click(sender, null!);
           e.Handled = true;
   }
+            // Ctrl+I - Import existing mnemonic
+        else if (e.Key == Key.I && Keyboard.Modifiers == ModifierKeys.Control)
+     {
+       ImportMnemonicButton_Click(sender, null!);
+         e.Handled = true;
+        }
             // Ctrl+M - Manage secrets
    else if (e.Key == Key.M && Keyboard.Modifiers == ModifierKeys.Control)
     {
@@ -163,12 +169,23 @@ public partial class MainWindow : Window
     private void CreateTokenButton_Click(object sender, RoutedEventArgs e)
     {
         var wizard = new CreateTokenWizard();
-    wizard.Owner = this;
+        wizard.Owner = this;
         if (wizard.ShowDialog() == true)
   {
    AddActivity($"Token '{wizard.TokenName}' created");
    _ = LoadServiceStatus(); // Refresh
         }
+    }
+
+    private void ImportMnemonicButton_Click(object sender, RoutedEventArgs e)
+    {
+        var wizard = new Wizards.ImportMnemonicWizard();
+  wizard.Owner = this;
+      if (wizard.ShowDialog() == true && wizard.ImportSuccessful)
+        {
+ AddActivity($"Mnemonic '{wizard.SecretName}' imported");
+       _ = LoadServiceStatus(); // Refresh
+     }
     }
 
     private void ManageSecretsButton_Click(object sender, RoutedEventArgs e)

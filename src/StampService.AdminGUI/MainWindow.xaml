@@ -57,7 +57,8 @@
                     <StackPanel>
                         <TextBlock Text="Quick Actions" Style="{StaticResource SectionHeaderStyle}"/>
 
-                        <UniformGrid Rows="2" Columns="2" Margin="0,8,0,0">
+                        <!-- First row: 2 buttons -->
+                        <UniformGrid Rows="1" Columns="2" Margin="0,8,0,0">
                             <!-- Create Token -->
                             <Button Height="100" Margin="4" Click="CreateTokenButton_Click"
                                     Style="{StaticResource MaterialDesignRaisedButton}"
@@ -70,6 +71,21 @@
                                 </StackPanel>
                             </Button>
 
+                            <!-- Import Existing Key -->
+                            <Button Height="100" Margin="4" Click="ImportMnemonicButton_Click"
+                                    Style="{StaticResource MaterialDesignRaisedButton}"
+                                    materialDesign:ButtonAssist.CornerRadius="8"
+                                    ToolTip="Import existing 12-word mnemonic (Ctrl+I)">
+                                <StackPanel>
+                                    <materialDesign:PackIcon Kind="Import" Width="32" Height="32" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="Import Existing Key" FontWeight="SemiBold" Margin="0,8,0,0"/>
+                                    <TextBlock Text="Add existing mnemonic" FontSize="11" Opacity="0.7"/>
+                                </StackPanel>
+                            </Button>
+                        </UniformGrid>
+
+                        <!-- Second row: 2 buttons -->
+                        <UniformGrid Rows="1" Columns="2" Margin="0,0,0,0">
                             <!-- Manage Secrets -->
                             <Button Height="100" Margin="4" Click="ManageSecretsButton_Click"
                                     Style="{StaticResource MaterialDesignRaisedButton}"
@@ -93,28 +109,28 @@
                                     <TextBlock Text="Create and restore shares" FontSize="11" Opacity="0.7"/>
                                 </StackPanel>
                             </Button>
-
-                            <!-- Service Health -->
-                            <Button Height="100" Margin="4" Click="HealthButton_Click"
-                                    Style="{StaticResource MaterialDesignRaisedButton}"
-                                    materialDesign:ButtonAssist.CornerRadius="8"
-                                    ToolTip="Service health monitoring (Ctrl+H)">
-                                <StackPanel>
-                                    <materialDesign:PackIcon Kind="HeartPulse" Width="32" Height="32" HorizontalAlignment="Center"/>
-                                    <TextBlock Text="Service Health" FontWeight="SemiBold" Margin="0,8,0,0"/>
-                                    <TextBlock Text="Monitor and diagnose" FontSize="11" Opacity="0.7"/>
-                                </StackPanel>
-                            </Button>
                         </UniformGrid>
+
+                        <!-- Third row: Full-width button -->
+                        <Button Height="80" Margin="4" Click="HealthButton_Click"
+                                Style="{StaticResource MaterialDesignRaisedButton}"
+                                materialDesign:ButtonAssist.CornerRadius="8"
+                                ToolTip="Service health monitoring (Ctrl+H)">
+                            <StackPanel>
+                                <materialDesign:PackIcon Kind="HeartPulse" Width="28" Height="28" HorizontalAlignment="Center"/>
+                                <TextBlock Text="Service Health" FontWeight="SemiBold" Margin="0,8,0,0"/>
+                                <TextBlock Text="Monitor and diagnose" FontSize="11" Opacity="0.7"/>
+                            </StackPanel>
+                        </Button>
                     </StackPanel>
                 </materialDesign:Card>
 
                 <!-- Service Status -->
                 <materialDesign:Card Grid.Row="1" Style="{StaticResource CardStyle}" materialDesign:ElevationAssist.Elevation="Dp4">
-     <StackPanel>
-        <TextBlock Text="Service Status" Style="{StaticResource SectionHeaderStyle}"/>
+                    <StackPanel>
+                        <TextBlock Text="Service Status" Style="{StaticResource SectionHeaderStyle}"/>
 
-        <Grid Margin="0,8,0,0">
+                        <Grid Margin="0,8,0,0">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="*"/>
