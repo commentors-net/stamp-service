@@ -50,8 +50,6 @@ Stamp Service AdminGUI is a Windows desktop application that provides a user-fri
 
 > **Note**: If prompted by Windows User Account Control (UAC), click "Yes" to grant administrator privileges.
 
-**[SCREENSHOT PLACEHOLDER: Application launch icon and UAC prompt]**
-
 ### First Launch
 
 When you first launch the application:
@@ -59,8 +57,6 @@ When you first launch the application:
 1. The Stamp Service will automatically start in the background
 2. The main dashboard will display the service status
 3. You'll see an empty activity feed (no tokens created yet)
-
-**[SCREENSHOT PLACEHOLDER: First launch main dashboard]**
 
 ### Administrator Privileges
 
@@ -72,15 +68,13 @@ The application requires administrator privileges to:
 
 If the application is not running as administrator, you will see a warning message prompting you to restart with elevated privileges.
 
-**[SCREENSHOT PLACEHOLDER: Administrator privilege warning dialog]**
-
 ---
 
 ## Main Dashboard
 
 The main dashboard is your central hub for monitoring and managing the Stamp Service.
 
-**[SCREENSHOT PLACEHOLDER: Full main dashboard with all sections labeled]**
+<img width="979" height="686" alt="image" src="https://github.com/user-attachments/assets/289cf7dd-694c-45d2-8c5a-93ae65b14e29" />
 
 ### Dashboard Sections
 
@@ -92,7 +86,8 @@ Displays real-time information about the Stamp Service:
 - **Secrets Count**: Total number of stored secrets
 - **Last Activity**: Timestamp of the most recent operation
 
-**[SCREENSHOT PLACEHOLDER: Service status panel closeup]**
+<img width="908" height="201" alt="image" src="https://github.com/user-attachments/assets/849488ae-1096-4b0a-81e5-a9b73d214642" />
+
 
 #### 2. Quick Action Buttons (Center)
 Five buttons for common tasks:
@@ -108,7 +103,7 @@ Five buttons for common tasks:
 **Row 3:**
 - **Service Health** (Teal, full width) - View detailed service diagnostics
 
-**[SCREENSHOT PLACEHOLDER: Quick action buttons grid]**
+<img width="894" height="407" alt="image" src="https://github.com/user-attachments/assets/55eee8a4-b061-4a43-9bf0-e6c4d2983bd2" />
 
 #### 3. Recent Activity Feed (Bottom)
 Shows the 10 most recent operations:
@@ -117,12 +112,11 @@ Shows the 10 most recent operations:
 - Description of the action performed
 - Color-coded by operation type
 
-**[SCREENSHOT PLACEHOLDER: Activity feed with sample entries]**
+<img width="905" height="131" alt="image" src="https://github.com/user-attachments/assets/5413d5ab-85be-45fc-9ae3-0226ad7c5b12" />
 
 ### Dashboard Actions
 
 #### Refreshing Status
-- **Manual Refresh**: Click the "Refresh Status" button in the status panel
 - **Auto Refresh**: Status updates automatically every 30 seconds
 - **Keyboard Shortcut**: Press `F5` to refresh
 
@@ -135,11 +129,9 @@ Click any of the quick action buttons to navigate to the respective feature area
 
 The Create Token wizard guides you through generating a new blockchain token with automatic key generation and secure storage.
 
-**[SCREENSHOT PLACEHOLDER: Create Token wizard step navigation]**
-
 ### Step 1: Token Details
 
-**[SCREENSHOT PLACEHOLDER: Step 1 - Token Details form]**
+<img width="831" height="685" alt="image" src="https://github.com/user-attachments/assets/65c9af23-7309-4a7a-a44c-d33923e4b9b5" />
 
 #### Fields:
 1. **Token Name** (Required)
@@ -150,11 +142,7 @@ The Create Token wizard guides you through generating a new blockchain token wit
 2. **Network** (Required)
    - Select the blockchain network from dropdown:
      - Ethereum Mainnet
-     - Ethereum Testnet (Goerli)
-     - Binance Smart Chain
-     - Polygon
-     - Solana Mainnet
-   - Solana Devnet
+     - Ethereum Testnet (Sepolia)
 
 3. **Description** (Optional)
    - Add notes about the token's purpose
@@ -166,7 +154,7 @@ The Create Token wizard guides you through generating a new blockchain token wit
 
 ### Step 2: Key Generation
 
-**[SCREENSHOT PLACEHOLDER: Step 2 - Key generation progress]**
+<img width="684" height="586" alt="image" src="https://github.com/user-attachments/assets/14b8d506-23cf-490e-b829-e57f0a50b624" />
 
 The wizard automatically generates cryptographic keys:
 
@@ -196,7 +184,7 @@ The wizard automatically generates cryptographic keys:
 
 ### Step 3: Backup Share Creation
 
-**[SCREENSHOT PLACEHOLDER: Step 3 - Backup location selection]**
+<img width="680" height="592" alt="image" src="https://github.com/user-attachments/assets/a30dcea0-a6f8-4d69-bfe6-edc383866790" />
 
 Automatically creates encrypted backup shares for recovery:
 
@@ -222,7 +210,7 @@ Each backup contains:
 
 ### Step 4: Summary & Completion
 
-**[SCREENSHOT PLACEHOLDER: Step 4 - Summary and completion]**
+<img width="683" height="595" alt="image" src="https://github.com/user-attachments/assets/6528e5b2-40ba-4c67-8cb7-3bdb2fe1fdc8" />
 
 Review the created token:
 
@@ -258,7 +246,7 @@ Once completed:
 
 The Import Mnemonic wizard allows you to add existing 12-word mnemonic phrases to the Stamp Service for secure storage and management.
 
-**[SCREENSHOT PLACEHOLDER: Import Mnemonic wizard]**
+<img width="677" height="593" alt="image" src="https://github.com/user-attachments/assets/7440fbe6-5dad-4332-8867-f72ffa22f30d" />
 
 ### When to Use Import
 
@@ -272,18 +260,16 @@ Use the Import wizard when you:
 
 ### Accessing the Import Wizard
 
-Three ways to open:
+Two ways to open:
 1. **Dashboard Button**: Click "Import Existing Key" in Quick Actions
 2. **Keyboard Shortcut**: Press `Ctrl+I`
-3. **Menu**: (if menu bar exists)
 
-**[SCREENSHOT PLACEHOLDER: Import Existing Key button highlighted]**
 
 ---
 
 ### Step 1: Mnemonic Input
 
-**[SCREENSHOT PLACEHOLDER: Step 1 - Mnemonic input form]**
+<img width="678" height="595" alt="image" src="https://github.com/user-attachments/assets/8a3562f3-d8d8-4081-a788-28957285ec50" />
 
 #### Fields:
 
@@ -314,13 +300,6 @@ Three ways to open:
    - Select the blockchain network:
      - Ethereum Mainnet
      - Ethereum Testnet (Sepolia)
- - Polygon Mainnet
-     - Polygon Testnet (Mumbai)
-     - Binance Smart Chain Mainnet
-     - Binance Smart Chain Testnet
-     - Solana Mainnet
-     - Solana Devnet
-     - Other Network
 
 #### Security Warning
 
@@ -339,7 +318,7 @@ A prominent warning is displayed:
 
 ### Step 2: Verification & Storage
 
-**[SCREENSHOT PLACEHOLDER: Step 2 - Verification progress]**
+<img width="681" height="585" alt="image" src="https://github.com/user-attachments/assets/2f56fb62-7cce-4a39-a94d-b374524bcf9b" />
 
 The wizard automatically performs these steps:
 
@@ -387,7 +366,7 @@ Each step shows:
 
 ### Step 3: Completion Summary
 
-**[SCREENSHOT PLACEHOLDER: Step 3 - Success summary]**
+<img width="686" height="586" alt="image" src="https://github.com/user-attachments/assets/18b3b3b7-aeee-409a-8b0c-6a7336cfde68" />
 
 Review the imported mnemonic:
 
@@ -412,7 +391,8 @@ The wizard suggests:
 2. **? Create backup shares**: Use Backup & Recovery to create shares
 3. **? Test with small transaction**: Verify the address is correct
 
-**[SCREENSHOT PLACEHOLDER: Next steps card]**
+<img width="626" height="144" alt="image" src="https://github.com/user-attachments/assets/1ddb68ee-4e30-41cd-9933-d6c4e4ebfb8d" />
+
 
 #### Actions:
 - **Finish**: Complete wizard and return to dashboard
@@ -440,8 +420,6 @@ Once you click Finish:
    - Create backup shares immediately
    - Test the key with a small transaction
    - Document the import in your records
-
-**[SCREENSHOT PLACEHOLDER: Dashboard after import]**
 
 ---
 
@@ -643,8 +621,6 @@ After importing, verify:
 
 The Secret Manager provides a comprehensive interface for viewing, searching, and managing all stored secrets.
 
-**[SCREENSHOT PLACEHOLDER: Secret Manager main view]**
-
 ### Secret Manager Interface
 
 #### Main Components
@@ -667,11 +643,11 @@ The Secret Manager provides a comprehensive interface for viewing, searching, an
    - **Delete Secret**: Remove selected secret(s)
    - **Refresh**: Reload secrets from service
 
-**[SCREENSHOT PLACEHOLDER: Secrets grid with sample data]**
+<img width="979" height="681" alt="image" src="https://github.com/user-attachments/assets/f5cfba07-609d-4831-bc24-39d20bc716b2" />
 
 ### Viewing Secret Details
 
-**[SCREENSHOT PLACEHOLDER: Secret Details window]**
+<img width="584" height="598" alt="image" src="https://github.com/user-attachments/assets/7c5894e9-5437-40ef-866b-45d412923eb5" />
 
 #### Opening Details
 1. Select a secret in the grid
@@ -696,7 +672,10 @@ The Secret Manager provides a comprehensive interface for viewing, searching, an
 
 > **Security Warning**: Only reveal secrets when necessary and ensure no one is looking over your shoulder.
 
-**[SCREENSHOT PLACEHOLDER: Secret value revealed]**
+<img width="578" height="583" alt="image" src="https://github.com/user-attachments/assets/c63875f5-4d1b-4182-a389-205582d69a4b" />
+
+<img width="581" height="596" alt="image" src="https://github.com/user-attachments/assets/d50bc07d-a987-4d65-bac3-f540532659d5" />
+
 
 ##### Metadata (Bottom)
 Displays all custom metadata key-value pairs:
@@ -711,8 +690,6 @@ Displays all custom metadata key-value pairs:
 - **Copy to Clipboard**: Copy secret value (?? sensitive!)
 - **Export to File**: Save secret to encrypted file
 - **Close**: Close details window
-
-**[SCREENSHOT PLACEHOLDER: Metadata section]**
 
 ### Searching Secrets
 
@@ -729,7 +706,7 @@ Enter any text to filter by:
 - `Master` - Find all master contract secrets
 - `0x742` - Find secret with matching address
 
-**[SCREENSHOT PLACEHOLDER: Search in action with results]**
+<img width="977" height="681" alt="image" src="https://github.com/user-attachments/assets/d4e3bce7-eb8c-47e8-95d5-905d0cff6f5f" />
 
 ### Adding a New Secret
 
@@ -750,7 +727,7 @@ Enter any text to filter by:
 
 ### Deleting Secrets
 
-**[SCREENSHOT PLACEHOLDER: Delete confirmation dialog]**
+<img width="975" height="691" alt="image" src="https://github.com/user-attachments/assets/47d34baa-5f44-49dc-a7b8-b4911d6bed7e" />
 
 #### To Delete a Secret:
 1. Select secret(s) in the grid
@@ -784,7 +761,7 @@ Enter any text to filter by:
 
 The Backup & Recovery view provides tools for creating encrypted backup shares and recovering secrets from existing shares.
 
-**[SCREENSHOT PLACEHOLDER: Backup & Recovery full view]**
+<img width="879" height="1065" alt="image" src="https://github.com/user-attachments/assets/08ecacbc-b0e0-4a34-9ced-c19ec2a8bf88" />
 
 ### Understanding Shamir's Secret Sharing
 
@@ -807,7 +784,8 @@ Shamir's Secret Sharing (SSS) splits a secret into multiple shares where:
 
 ### Creating Backup Shares
 
-**[SCREENSHOT PLACEHOLDER: Create Backup section]**
+<img width="837" height="323" alt="image" src="https://github.com/user-attachments/assets/dfce5c7f-85ef-4af2-9b0e-e1e3af23d29d" />
+
 
 #### Step-by-Step Process
 
@@ -820,7 +798,6 @@ Shamir's Secret Sharing (SSS) splits a secret into multiple shares where:
   - Default: 3 shares required
   - Higher threshold = more security, less convenience
 
-**[SCREENSHOT PLACEHOLDER: Share configuration dropdowns]**
 
 ##### 2. Select Output Folder
 - Click "Select Output Folder" button
@@ -831,14 +808,13 @@ Shamir's Secret Sharing (SSS) splits a secret into multiple shares where:
   - Cloud storage folder
   - Multiple locations for different shares
 
-**[SCREENSHOT PLACEHOLDER: Folder picker dialog]**
-
 ##### 3. Create Shares
 - Click "Create Backup Shares" button
 - Progress bar shows creation status
 - Completion message displays total shares created
 
-**[SCREENSHOT PLACEHOLDER: Backup creation progress]**
+<img width="854" height="460" alt="image" src="https://github.com/user-attachments/assets/a24ea3c1-d1fa-43ba-860d-ea7ed2401294" />
+
 
 #### Backup Output
 
@@ -853,7 +829,7 @@ The backup folder contains:
 ??? README.txt (instructions for recovery)
 ```
 
-**[SCREENSHOT PLACEHOLDER: Backup folder contents]**
+<img width="715" height="408" alt="image" src="https://github.com/user-attachments/assets/a4fcd3f5-4489-410e-b13b-952680d0acb6" />
 
 Each share file contains:
 - Encrypted share data
@@ -881,13 +857,11 @@ After creating backups:
    - Digital: Encrypted cloud storage, password manager
    - Hybrid: Mix of physical and digital locations
 
-**[SCREENSHOT PLACEHOLDER: Share distribution diagram]**
-
 ---
 
 ### Recovering from Backup Shares
 
-**[SCREENSHOT PLACEHOLDER: Recovery section]**
+<img width="834" height="510" alt="image" src="https://github.com/user-attachments/assets/38186578-e488-49b5-8b12-e241e3365b32" />
 
 #### Recovery Process
 
@@ -913,7 +887,7 @@ The share list displays:
 - Share numbers (parsed from file)
 - Status indicators
 
-**[SCREENSHOT PLACEHOLDER: Share list with loaded files]**
+<img width="824" height="572" alt="image" src="https://github.com/user-attachments/assets/5c165b3d-cae2-4015-aa3b-cef62b92e47a" />
 
 ##### 3. Check Status Indicator
 
@@ -924,7 +898,8 @@ Status bar shows:
   - ?? "Need X more shares" (insufficient)
   - ? "Ready to recover" (sufficient)
 
-**[SCREENSHOT PLACEHOLDER: Status indicator variations]**
+<img width="818" height="602" alt="image" src="https://github.com/user-attachments/assets/fa05f64f-e0fa-4f33-bd12-4e614889f71b" />
+
 
 ##### 4. Start Recovery
 
@@ -933,7 +908,8 @@ Status bar shows:
 - Success message confirms recovery
 - Recovered secrets are stored in service
 
-**[SCREENSHOT PLACEHOLDER: Recovery progress dialog]**
+<img width="792" height="550" alt="image" src="https://github.com/user-attachments/assets/fba3bc19-7cb0-40a1-9e50-2db4e7ec4187" />
+
 
 #### Recovery Options
 
@@ -955,8 +931,6 @@ After successful recovery:
    - Verify addresses match expected values
    - Test token functionality if applicable
 
-**[SCREENSHOT PLACEHOLDER: Recovered secrets in Secret Manager]**
-
 ---
 
 ### Backup Best Practices
@@ -977,8 +951,6 @@ After successful recovery:
 | Digital Cloud | Google Drive, Dropbox | Accessible anywhere | Internet dependent |
 | Trusted Person | Family, lawyer | Redundancy | Trust required |
 | Hardware | USB drive, NAS | Full control | Hardware failure |
-
-**[SCREENSHOT PLACEHOLDER: Storage location diagram]**
 
 #### Labeling Shares
 
@@ -1013,7 +985,8 @@ Document your recovery process:
 
 The Service Health view provides real-time diagnostics and monitoring of the Stamp Service.
 
-**[SCREENSHOT PLACEHOLDER: Service Health view]**
+<img width="881" height="681" alt="image" src="https://github.com/user-attachments/assets/002cbeb1-4786-4cc9-a01a-cf8d7faa6354" />
+
 
 ### Service Status Dashboard
 
@@ -1028,7 +1001,9 @@ The Service Health view provides real-time diagnostics and monitoring of the Sta
 
 #### System Metrics
 
-**[SCREENSHOT PLACEHOLDER: System metrics panel]**
+<img width="823" height="241" alt="image" src="https://github.com/user-attachments/assets/06e1139a-47a6-4237-ad8c-a233607e408c" />
+<img width="820" height="199" alt="image" src="https://github.com/user-attachments/assets/80905ee5-3055-494e-bd37-9dcf9edc6240" />
+
 
 - **Uptime**: Total service run time
 - **Memory Usage**: Service RAM consumption
@@ -1038,8 +1013,6 @@ The Service Health view provides real-time diagnostics and monitoring of the Sta
 
 #### Recent Operations
 
-**[SCREENSHOT PLACEHOLDER: Recent operations log]**
-
 Real-time log of service activities:
 - Timestamp
 - Operation type (Store, Retrieve, Delete, List)
@@ -1048,7 +1021,6 @@ Real-time log of service activities:
 
 ### Service Controls
 
-**[SCREENSHOT PLACEHOLDER: Service control buttons]**
 
 #### Available Actions
 
@@ -1075,7 +1047,6 @@ Real-time log of service activities:
 
 ### Diagnostics Panel
 
-**[SCREENSHOT PLACEHOLDER: Diagnostics panel]**
 
 #### System Information
 
@@ -1097,7 +1068,6 @@ Automated tests:
 
 ### Troubleshooting Tools
 
-**[SCREENSHOT PLACEHOLDER: Troubleshooting tools section]**
 
 #### Connection Test
 - Tests IPC named pipe connection
@@ -1120,11 +1090,9 @@ Automated tests:
 
 The Settings window allows you to customize the AdminGUI behavior and appearance.
 
-**[SCREENSHOT PLACEHOLDER: Settings window]**
 
 ### General Settings
 
-**[SCREENSHOT PLACEHOLDER: General settings tab]**
 
 #### Application Behavior
 
@@ -1149,7 +1117,6 @@ The Settings window allows you to customize the AdminGUI behavior and appearance
 
 ### Appearance Settings
 
-**[SCREENSHOT PLACEHOLDER: Appearance settings tab]**
 
 #### Theme
 
@@ -1171,7 +1138,6 @@ The Settings window allows you to customize the AdminGUI behavior and appearance
 
 ### Security Settings
 
-**[SCREENSHOT PLACEHOLDER: Security settings tab]**
 
 #### Secret Display
 
@@ -1193,7 +1159,6 @@ The Settings window allows you to customize the AdminGUI behavior and appearance
 
 ### Network Settings
 
-**[SCREENSHOT PLACEHOLDER: Network settings tab]**
 
 #### Service Connection
 
@@ -1214,7 +1179,6 @@ Customize network dropdown options:
 
 ### Advanced Settings
 
-**[SCREENSHOT PLACEHOLDER: Advanced settings tab]**
 
 #### Developer Options
 
@@ -1236,7 +1200,6 @@ Customize network dropdown options:
 
 ### Applying Settings
 
-**[SCREENSHOT PLACEHOLDER: Settings action buttons]**
 
 - **Save**: Save changes and close
 - **Apply**: Save without closing
@@ -1249,7 +1212,6 @@ Customize network dropdown options:
 
 Master these keyboard shortcuts for efficient navigation and operation.
 
-**[SCREENSHOT PLACEHOLDER: Keyboard shortcuts reference card]**
 
 ### Global Shortcuts
 
@@ -1312,7 +1274,6 @@ Common issues and their solutions.
 
 ### Application Won't Start
 
-**[SCREENSHOT PLACEHOLDER: Common error dialogs]**
 
 #### Issue: "Application requires administrator privileges"
 
@@ -1686,5 +1647,3 @@ Maintain a list of:
 ---
 
 **End of User Manual**
-
-*For additional support, consult the project documentation or submit an issue on GitHub.*
