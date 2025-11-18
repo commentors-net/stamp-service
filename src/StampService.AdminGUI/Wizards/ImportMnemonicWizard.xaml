@@ -10,187 +10,187 @@
         FontFamily="{materialDesign:MaterialDesignFont}">
 
     <Grid>
-  <Grid.RowDefinitions>
+        <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-          <RowDefinition Height="*"/>
-  <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <!-- Header -->
         <materialDesign:ColorZone Grid.Row="0" Mode="PrimaryMid" Padding="16">
-       <StackPanel>
-             <TextBlock x:Name="StepIndicator" Text="Step 1 of 3" FontSize="18" FontWeight="SemiBold"/>
-      </StackPanel>
+            <StackPanel>
+                <TextBlock x:Name="StepIndicator" Text="Step 1 of 3" FontSize="18" FontWeight="SemiBold"/>
+            </StackPanel>
         </materialDesign:ColorZone>
 
         <!-- Content -->
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
             <Grid Margin="24">
-            
-    <!-- Step 1: Mnemonic Input -->
-          <StackPanel x:Name="Step1Panel" Visibility="Visible">
- <TextBlock Text="Import Existing Mnemonic" FontSize="20" FontWeight="SemiBold" Margin="0,0,0,16"/>
 
-    <materialDesign:Card Padding="16" Background="{DynamicResource MaterialDesignDivider}" Margin="0,0,0,16">
-       <StackPanel>
-     <StackPanel Orientation="Horizontal">
-           <materialDesign:PackIcon Kind="ShieldAlert" Width="24" Height="24" Foreground="Orange" VerticalAlignment="Top" Margin="0,0,8,0"/>
-       <StackPanel>
-               <TextBlock Text="Security Warning" FontWeight="Bold" Foreground="Orange"/>
-       <TextBlock TextWrapping="Wrap" Margin="0,4,0,0">
+                <!-- Step 1: Mnemonic Input -->
+                <StackPanel x:Name="Step1Panel" Visibility="Visible">
+                    <TextBlock Text="Import Existing Mnemonic" FontSize="20" FontWeight="SemiBold" Margin="0,0,0,16"/>
+
+                    <materialDesign:Card Padding="16" Background="{DynamicResource MaterialDesignDivider}" Margin="0,0,0,16">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <materialDesign:PackIcon Kind="ShieldAlert" Width="24" Height="24" Foreground="Orange" VerticalAlignment="Top" Margin="0,0,8,0"/>
+                                <StackPanel>
+                                    <TextBlock Text="Security Warning" FontWeight="Bold" Foreground="Orange"/>
+                                    <TextBlock TextWrapping="Wrap" Margin="0,4,0,0">
        Only enter your mnemonic on a trusted, secure computer.
  Never share your mnemonic with anyone or enter it on untrusted websites.
-   </TextBlock>
-        </StackPanel>
-       </StackPanel>
-     </StackPanel>
-      </materialDesign:Card>
+                                    </TextBlock>
+                                </StackPanel>
+                            </StackPanel>
+                        </StackPanel>
+                    </materialDesign:Card>
 
-            <TextBlock Text="Secret Name" Margin="0,0,0,4"/>
-         <TextBox x:Name="SecretNameInput" 
+                    <TextBlock Text="Secret Name" Margin="0,0,0,4"/>
+                    <TextBox x:Name="SecretNameInput" 
       materialDesign:HintAssist.Hint="e.g., MyToken_MasterContract"
     Style="{StaticResource MaterialDesignOutlinedTextBox}"
                Margin="0,0,0,16"/>
 
-    <TextBlock Text="12-Word Mnemonic Phrase" Margin="0,0,0,4"/>
-   <TextBlock Text="Enter your 12 words separated by spaces" 
+                    <TextBlock Text="12-Word Mnemonic Phrase" Margin="0,0,0,4"/>
+                    <TextBlock Text="Enter your 12 words separated by spaces" 
   FontSize="11" 
           Opacity="0.7" 
              Margin="0,0,0,4"/>
-        <TextBox x:Name="MnemonicInput" 
+                    <TextBox x:Name="MnemonicInput" 
           materialDesign:HintAssist.Hint="word1 word2 word3 ..."
       Style="{StaticResource MaterialDesignOutlinedTextBox}"
    AcceptsReturn="True"
               TextWrapping="Wrap"
       Height="80"
  Margin="0,0,0,4"/>
-      <TextBlock x:Name="WordCountText" 
+                    <TextBlock x:Name="WordCountText" 
         Text="Word count: 0" 
       FontSize="11" 
              Opacity="0.7" 
              Margin="0,0,0,16"/>
 
-    <TextBlock Text="Key Type" Margin="0,0,0,8"/>
-  <ComboBox x:Name="KeyTypeComboBox" 
+                    <TextBlock Text="Key Type" Margin="0,0,0,8"/>
+                    <ComboBox x:Name="KeyTypeComboBox" 
            Style="{StaticResource MaterialDesignOutlinedComboBox}"
           Margin="0,0,0,16"
           SelectedIndex="0">
-           <ComboBoxItem Content="Master Contract Key"/>
-          <ComboBoxItem Content="Master Proxy Key"/>
+                        <ComboBoxItem Content="Master Contract Key"/>
+                        <ComboBoxItem Content="Master Proxy Key"/>
                     </ComboBox>
 
-         <TextBlock Text="Network" Margin="0,0,0,8"/>
-     <ComboBox x:Name="NetworkComboBox" 
+                    <TextBlock Text="Network" Margin="0,0,0,8"/>
+                    <ComboBox x:Name="NetworkComboBox" 
         Style="{StaticResource MaterialDesignOutlinedComboBox}"
  SelectedIndex="0">
-               <ComboBoxItem Content="Ethereum Mainnet"/>
-      <ComboBoxItem Content="Ethereum Testnet (Sepolia)"/>
-          <ComboBoxItem Content="Polygon Mainnet"/>
-      <ComboBoxItem Content="Polygon Testnet (Mumbai)"/>
-      <ComboBoxItem Content="Binance Smart Chain Mainnet"/>
-          <ComboBoxItem Content="Binance Smart Chain Testnet"/>
-   <ComboBoxItem Content="Solana Mainnet"/>
-   <ComboBoxItem Content="Solana Devnet"/>
-        <ComboBoxItem Content="Other Network"/>
-</ComboBox>
-       </StackPanel>
+                        <ComboBoxItem Content="Ethereum Mainnet"/>
+                        <ComboBoxItem Content="Ethereum Testnet (Sepolia)"/>
+                        <!-- <ComboBoxItem Content="Polygon Mainnet"/>
+                        <ComboBoxItem Content="Polygon Testnet (Mumbai)"/>
+                        <ComboBoxItem Content="Binance Smart Chain Mainnet"/>
+                        <ComboBoxItem Content="Binance Smart Chain Testnet"/>
+                        <ComboBoxItem Content="Solana Mainnet"/>
+                        <ComboBoxItem Content="Solana Devnet"/>
+                        <ComboBoxItem Content="Other Network"/> -->
+                    </ComboBox>
+                </StackPanel>
 
-      <!-- Step 2: Verification -->
-  <StackPanel x:Name="Step2Panel" Visibility="Collapsed">
-      <TextBlock Text="Verifying Mnemonic..." FontSize="20" FontWeight="SemiBold" Margin="0,0,0,16"/>
+                <!-- Step 2: Verification -->
+                <StackPanel x:Name="Step2Panel" Visibility="Collapsed">
+                    <TextBlock Text="Verifying Mnemonic..." FontSize="20" FontWeight="SemiBold" Margin="0,0,0,16"/>
 
-                <materialDesign:Card Padding="16" Margin="0,0,0,8">
- <StackPanel>
-   <TextBlock x:Name="ValidationStatus" Text="? Validating mnemonic..." FontWeight="SemiBold"/>
-    <TextBlock Text="Checking word validity and format" Margin="0,4,0,0" FontSize="12" Opacity="0.7"/>
-              </StackPanel>
-        </materialDesign:Card>
+                    <materialDesign:Card Padding="16" Margin="0,0,0,8">
+                        <StackPanel>
+                            <TextBlock x:Name="ValidationStatus" Text="? Validating mnemonic..." FontWeight="SemiBold"/>
+                            <TextBlock Text="Checking word validity and format" Margin="0,4,0,0" FontSize="12" Opacity="0.7"/>
+                        </StackPanel>
+                    </materialDesign:Card>
 
-    <materialDesign:Card Padding="16" Margin="0,0,0,8">
-    <StackPanel>
-         <TextBlock x:Name="WalletStatus" Text="? Deriving wallet..." FontWeight="SemiBold"/>
-      <TextBlock x:Name="AddressText" Text="Address: Calculating..." Margin="0,4,0,0" FontSize="12" Opacity="0.7"/>
-             </StackPanel>
-      </materialDesign:Card>
+                    <materialDesign:Card Padding="16" Margin="0,0,0,8">
+                        <StackPanel>
+                            <TextBlock x:Name="WalletStatus" Text="? Deriving wallet..." FontWeight="SemiBold"/>
+                            <TextBlock x:Name="AddressText" Text="Address: Calculating..." Margin="0,4,0,0" FontSize="12" Opacity="0.7"/>
+                        </StackPanel>
+                    </materialDesign:Card>
 
-        <materialDesign:Card Padding="16" Margin="0,0,0,8">
-  <StackPanel>
-<TextBlock x:Name="StorageStatus" Text="? Storing securely..." FontWeight="SemiBold"/>
-               <TextBlock Text="Encrypted with DPAPI in Registry" Margin="0,4,0,0" FontSize="12" Opacity="0.7"/>
-            </StackPanel>
-        </materialDesign:Card>
+                    <materialDesign:Card Padding="16" Margin="0,0,0,8">
+                        <StackPanel>
+                            <TextBlock x:Name="StorageStatus" Text="? Storing securely..." FontWeight="SemiBold"/>
+                            <TextBlock Text="Encrypted with DPAPI in Registry" Margin="0,4,0,0" FontSize="12" Opacity="0.7"/>
+                        </StackPanel>
+                    </materialDesign:Card>
 
-   <ProgressBar x:Name="ProgressBar" 
+                    <ProgressBar x:Name="ProgressBar" 
     Visibility="Collapsed"
        Height="4" 
        Margin="0,16,0,0"/>
-     </StackPanel>
+                </StackPanel>
 
-   <!-- Step 3: Complete -->
-            <StackPanel x:Name="Step3Panel" Visibility="Collapsed">
-<TextBlock Text="Import Successful!" FontSize="20" FontWeight="SemiBold" Margin="0,0,0,16"/>
+                <!-- Step 3: Complete -->
+                <StackPanel x:Name="Step3Panel" Visibility="Collapsed">
+                    <TextBlock Text="Import Successful!" FontSize="20" FontWeight="SemiBold" Margin="0,0,0,16"/>
 
-              <materialDesign:Card Padding="16" Margin="0,0,0,16">
-     <StackPanel>
-              <TextBlock Text="Summary" FontWeight="SemiBold" FontSize="16" Margin="0,0,0,12"/>
-     
-          <Grid>
-              <Grid.ColumnDefinitions>
-       <ColumnDefinition Width="120"/>
-            <ColumnDefinition Width="*"/>
-         </Grid.ColumnDefinitions>
-      <Grid.RowDefinitions>
-         <RowDefinition Height="Auto"/>
-          <RowDefinition Height="Auto"/>
-     <RowDefinition Height="Auto"/>
-     <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
+                    <materialDesign:Card Padding="16" Margin="0,0,0,16">
+                        <StackPanel>
+                            <TextBlock Text="Summary" FontWeight="SemiBold" FontSize="16" Margin="0,0,0,12"/>
 
- <TextBlock Grid.Row="0" Grid.Column="0" Text="Secret Name:" FontWeight="SemiBold"/>
-        <TextBlock Grid.Row="0" Grid.Column="1" x:Name="SummarySecretName" Margin="8,0,0,4"/>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="120"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
 
-      <TextBlock Grid.Row="1" Grid.Column="0" Text="Key Type:" FontWeight="SemiBold"/>
- <TextBlock Grid.Row="1" Grid.Column="1" x:Name="SummaryKeyType" Margin="8,0,0,4"/>
+                                <TextBlock Grid.Row="0" Grid.Column="0" Text="Secret Name:" FontWeight="SemiBold"/>
+                                <TextBlock Grid.Row="0" Grid.Column="1" x:Name="SummarySecretName" Margin="8,0,0,4"/>
 
-          <TextBlock Grid.Row="2" Grid.Column="0" Text="Network:" FontWeight="SemiBold"/>
-<TextBlock Grid.Row="2" Grid.Column="1" x:Name="SummaryNetwork" Margin="8,0,0,4"/>
+                                <TextBlock Grid.Row="1" Grid.Column="0" Text="Key Type:" FontWeight="SemiBold"/>
+                                <TextBlock Grid.Row="1" Grid.Column="1" x:Name="SummaryKeyType" Margin="8,0,0,4"/>
 
-                 <TextBlock Grid.Row="3" Grid.Column="0" Text="Address:" FontWeight="SemiBold"/>
-      <TextBlock Grid.Row="3" Grid.Column="1" x:Name="SummaryAddress" Margin="8,0,0,4" TextWrapping="Wrap"/>
-           </Grid>
-  </StackPanel>
-   </materialDesign:Card>
+                                <TextBlock Grid.Row="2" Grid.Column="0" Text="Network:" FontWeight="SemiBold"/>
+                                <TextBlock Grid.Row="2" Grid.Column="1" x:Name="SummaryNetwork" Margin="8,0,0,4"/>
 
-  <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-    <materialDesign:PackIcon Kind="CheckCircle" Width="24" Height="24" Foreground="Green" VerticalAlignment="Center" Margin="0,0,8,0"/>
-               <TextBlock Text="Mnemonic imported and stored securely" Foreground="Green" FontWeight="SemiBold" VerticalAlignment="Center"/>
-        </StackPanel>
+                                <TextBlock Grid.Row="3" Grid.Column="0" Text="Address:" FontWeight="SemiBold"/>
+                                <TextBlock Grid.Row="3" Grid.Column="1" x:Name="SummaryAddress" Margin="8,0,0,4" TextWrapping="Wrap"/>
+                            </Grid>
+                        </StackPanel>
+                    </materialDesign:Card>
 
-        <materialDesign:Card Padding="16" Background="{DynamicResource MaterialDesignDivider}" Margin="0,16,0,0">
-          <StackPanel>
-                <TextBlock Text="Next Steps:" FontWeight="Bold" Margin="0,0,0,8"/>
-       <TextBlock Text="? View your imported key in Secret Manager" Margin="0,2,0,0"/>
-     <TextBlock Text="? Create backup shares for recovery" Margin="0,2,0,0"/>
-     <TextBlock Text="? Test the key with a small transaction" Margin="0,2,0,0"/>
-            </StackPanel>
-  </materialDesign:Card>
-      </StackPanel>
- 
-    </Grid>
-      </ScrollViewer>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                        <materialDesign:PackIcon Kind="CheckCircle" Width="24" Height="24" Foreground="Green" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                        <TextBlock Text="Mnemonic imported and stored securely" Foreground="Green" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                    </StackPanel>
+
+                    <materialDesign:Card Padding="16" Background="{DynamicResource MaterialDesignDivider}" Margin="0,16,0,0">
+                        <StackPanel>
+                            <TextBlock Text="Next Steps:" FontWeight="Bold" Margin="0,0,0,8"/>
+                            <TextBlock Text="? View your imported key in Secret Manager" Margin="0,2,0,0"/>
+                            <TextBlock Text="? Create backup shares for recovery" Margin="0,2,0,0"/>
+                            <TextBlock Text="? Test the key with a small transaction" Margin="0,2,0,0"/>
+                        </StackPanel>
+                    </materialDesign:Card>
+                </StackPanel>
+
+            </Grid>
+        </ScrollViewer>
 
         <!-- Footer Buttons -->
         <materialDesign:ColorZone Grid.Row="2" Mode="PrimaryLight" Padding="16">
-    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                 <Button x:Name="CancelButton" Content="Cancel" 
            Click="CancelButton_Click"
            Style="{StaticResource MaterialDesignFlatButton}"
    Margin="0,0,8,0"/>
- <Button x:Name="BackButton" Content="? Back" 
+                <Button x:Name="BackButton" Content="? Back" 
      Click="BackButton_Click"
                   Style="{StaticResource MaterialDesignOutlinedButton}"
       Margin="0,0,8,0"/>
-     <Button x:Name="NextButton" Content="Next ?" 
+                <Button x:Name="NextButton" Content="Next ?" 
     Click="NextButton_Click"
             Style="{StaticResource MaterialDesignRaisedButton}"/>
             </StackPanel>

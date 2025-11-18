@@ -5,13 +5,14 @@
 2. [Getting Started](#getting-started)
 3. [Main Dashboard](#main-dashboard)
 4. [Creating Tokens](#creating-tokens)
-5. [Managing Secrets](#managing-secrets)
-6. [Backup & Recovery](#backup--recovery)
-7. [Service Health Monitoring](#service-health-monitoring)
-8. [Settings & Configuration](#settings--configuration)
-9. [Keyboard Shortcuts](#keyboard-shortcuts)
-10. [Troubleshooting](#troubleshooting)
-11. [Best Practices](#best-practices)
+5. [Importing Existing Mnemonics](#importing-existing-mnemonics)
+6. [Managing Secrets](#managing-secrets)
+7. [Backup & Recovery](#backup--recovery)
+8. [Service Health Monitoring](#service-health-monitoring)
+9. [Settings & Configuration](#settings--configuration)
+10. [Keyboard Shortcuts](#keyboard-shortcuts)
+11. [Troubleshooting](#troubleshooting)
+12. [Best Practices](#best-practices)
 
 ---
 
@@ -94,12 +95,18 @@ Displays real-time information about the Stamp Service:
 **[SCREENSHOT PLACEHOLDER: Service status panel closeup]**
 
 #### 2. Quick Action Buttons (Center)
-Four large buttons for common tasks:
+Five buttons for common tasks:
 
-- **Create New Token** (Purple) - Launch the token creation wizard
+**Row 1:**
+- **Create New Token** (Blue) - Launch the token creation wizard
+- **Import Existing Key** (Blue) - Import existing 12-word mnemonic
+
+**Row 2:**
 - **Manage Secrets** (Blue) - Open the secret manager
 - **Backup & Recovery** (Orange) - Access backup and recovery tools
-- **Service Health** (Teal) - View detailed service diagnostics
+
+**Row 3:**
+- **Service Health** (Teal, full width) - View detailed service diagnostics
 
 **[SCREENSHOT PLACEHOLDER: Quick action buttons grid]**
 
@@ -244,6 +251,391 @@ Once completed:
 - Activity logged in dashboard feed
 - Secrets available in Secret Manager
 - Backup shares saved to disk
+
+---
+
+## Importing Existing Mnemonics
+
+The Import Mnemonic wizard allows you to add existing 12-word mnemonic phrases to the Stamp Service for secure storage and management.
+
+**[SCREENSHOT PLACEHOLDER: Import Mnemonic wizard]**
+
+### When to Use Import
+
+Use the Import wizard when you:
+- Already have existing mnemonic phrases that need secure storage
+- Want to migrate keys from another wallet or system
+- Need to store recovery phrases for existing blockchain accounts
+- Want to centralize key management in Stamp Service
+
+> **Security Note**: Only import mnemonics on trusted, secure computers. Never share your mnemonics or enter them on untrusted websites.
+
+### Accessing the Import Wizard
+
+Three ways to open:
+1. **Dashboard Button**: Click "Import Existing Key" in Quick Actions
+2. **Keyboard Shortcut**: Press `Ctrl+I`
+3. **Menu**: (if menu bar exists)
+
+**[SCREENSHOT PLACEHOLDER: Import Existing Key button highlighted]**
+
+---
+
+### Step 1: Mnemonic Input
+
+**[SCREENSHOT PLACEHOLDER: Step 1 - Mnemonic input form]**
+
+#### Fields:
+
+1. **Secret Name** (Required)
+   - Enter a unique, descriptive identifier
+   - Examples: "MyWallet_Master", "PROD_ETH_Contract", "Personal_Backup"
+   - Must be unique across all stored secrets
+   - Used to identify the key in Secret Manager
+
+2. **12-Word Mnemonic Phrase** (Required)
+   - Enter your existing mnemonic phrase
+   - Must be exactly 12 words
+   - Words separated by spaces
+   - BIP39 standard English wordlist
+   - Can paste from clipboard or type manually
+
+   **Real-time Validation:**
+   - Word count display shows current count
+   - Turns green when exactly 12 words detected
+   - Validates words against BIP39 wordlist
+
+3. **Key Type** (Required)
+   - **Master Contract Key**: Main contract signing key
+   - **Master Proxy Key**: Proxy contract key
+   - Select based on your key's intended use
+
+4. **Network** (Required)
+   - Select the blockchain network:
+     - Ethereum Mainnet
+     - Ethereum Testnet (Sepolia)
+ - Polygon Mainnet
+     - Polygon Testnet (Mumbai)
+     - Binance Smart Chain Mainnet
+     - Binance Smart Chain Testnet
+     - Solana Mainnet
+     - Solana Devnet
+     - Other Network
+
+#### Security Warning
+
+A prominent warning is displayed:
+- Only enter mnemonics on trusted computers
+- Never share mnemonics with anyone
+- Don't enter on untrusted websites
+- Ensure administrator privileges are active
+
+#### Actions:
+- **Next**: Validates and proceeds to verification (requires all fields)
+- **Cancel**: Exit wizard without importing
+- **Back**: (disabled on first step)
+
+---
+
+### Step 2: Verification & Storage
+
+**[SCREENSHOT PLACEHOLDER: Step 2 - Verification progress]**
+
+The wizard automatically performs these steps:
+
+#### Automated Process
+
+1. **? Mnemonic Validation**
+   - Verifies 12-word format
+   - Validates words against BIP39 English wordlist
+   - Ensures proper format and structure
+   - Shows error if invalid
+
+2. **? Wallet Derivation**
+   - Derives HD wallet from mnemonic (BIP32/BIP44)
+   - Calculates account 0 (standard derivation path)
+   - Extracts public address
+   - Retrieves private key
+   - **Address displayed**: Shows derived blockchain address
+
+3. **? Secure Storage**
+   - Encrypts mnemonic with DPAPI (Windows Data Protection API)
+   - Stores in Windows Registry (LocalMachine scope)
+   - Saves metadata (network, address, key type, timestamp)
+   - Confirms successful storage
+
+#### Progress Indicators
+
+Each step shows:
+- Checkmark (?) when complete
+- Progress description
+- Any relevant information (e.g., derived address)
+
+#### If Errors Occur
+
+- Clear error message displayed
+- Returns to Step 1 for correction
+- No data stored if validation fails
+- Can modify input and retry
+
+#### Actions:
+- **Next**: Proceed to summary (automatic after successful storage)
+- **Back**: Return to Step 1 (loses current progress)
+- **Cancel**: Exit wizard (no data saved)
+
+---
+
+### Step 3: Completion Summary
+
+**[SCREENSHOT PLACEHOLDER: Step 3 - Success summary]**
+
+Review the imported mnemonic:
+
+#### Summary Information
+
+Displays:
+- **Secret Name**: The identifier you entered
+- **Key Type**: Master Contract or Master Proxy
+- **Network**: Selected blockchain network
+- **Address**: Derived public blockchain address (full address shown)
+
+#### Success Confirmation
+
+- ? Mnemonic imported and stored securely
+- Green checkmark with success message
+- Confirmation that encryption was successful
+
+#### Next Steps Recommendations
+
+The wizard suggests:
+1. **? View in Secret Manager**: Open Secret Manager to verify
+2. **? Create backup shares**: Use Backup & Recovery to create shares
+3. **? Test with small transaction**: Verify the address is correct
+
+**[SCREENSHOT PLACEHOLDER: Next steps card]**
+
+#### Actions:
+- **Finish**: Complete wizard and return to dashboard
+- **Back**: Return to verification step (view details again)
+
+---
+
+### After Import Completion
+
+Once you click Finish:
+
+1. **Dashboard Updated**:
+   - Activity feed shows: "Mnemonic '[SecretName]' imported"
+   - Service status refreshes
+   - Secret count increments
+
+2. **Secret Stored**:
+   - Available in Secret Manager
+   - Searchable by name, network, or address
+   - Can be viewed, copied, or deleted
+   - Full metadata stored
+
+3. **Recommended Actions**:
+   - Open Secret Manager to verify
+   - Create backup shares immediately
+   - Test the key with a small transaction
+   - Document the import in your records
+
+**[SCREENSHOT PLACEHOLDER: Dashboard after import]**
+
+---
+
+### Import Examples
+
+#### Example 1: Import Ethereum Mainnet Master Key
+
+**Scenario:** You have an existing Ethereum wallet mnemonic you want to manage
+
+```
+Steps:
+1. Click "Import Existing Key" or press Ctrl+I
+2. Secret Name: "Personal_ETH_Master"
+3. Paste 12-word mnemonic
+4. Key Type: Master Contract Key
+5. Network: Ethereum Mainnet
+6. Click Next ? validates and stores
+7. Review derived address (verify it matches your wallet)
+8. Click Finish
+9. Verify in Secret Manager
+```
+
+#### Example 2: Import Testnet Proxy Key
+
+**Scenario:** Import a Solana testnet key for development
+
+```
+Steps:
+1. Open Import Wizard (Ctrl+I)
+2. Secret Name: "DEV_SOL_Proxy"
+3. Enter 12-word mnemonic
+4. Key Type: Master Proxy Key
+5. Network: Solana Devnet
+6. Complete wizard
+7. Address displayed: [Solana address]
+8. Create backup shares
+9. Test with devnet tokens
+```
+
+#### Example 3: Import Multiple Keys
+
+**Scenario:** Import several keys from different networks
+
+```
+For each key:
+1. Open Import Wizard
+2. Use descriptive naming: "PROD_POLY_Master", "TEST_BSC_Proxy", etc.
+3. Select correct network for each
+4. Verify addresses after import
+5. Create backup shares for critical keys
+6. Document in external inventory
+```
+
+---
+
+### Import Validation
+
+#### Mnemonic Validation Rules
+
+Your mnemonic must meet these criteria:
+- **Exactly 12 words** (15/18/21/24 not currently supported)
+- **Valid BIP39 words**: All words from English wordlist
+- **Proper format**: Words separated by spaces
+- **No typos**: All words spelled correctly
+
+#### Common Validation Errors
+
+**"Mnemonic must be exactly 12 words"**
+- **Cause**: Too many or too few words
+- **Solution**: Count words, check for extra spaces
+
+**"Invalid mnemonic phrase"**
+- **Cause**: Words not in BIP39 wordlist, typos
+- **Solution**: Verify each word, check spelling
+
+**"Secret name already exists"**
+- **Cause**: Name conflicts with existing secret
+- **Solution**: Use a different, unique name
+
+**"Failed to store secret"**
+- **Cause**: Service connection issue, permissions
+- **Solution**: Verify service is running, check admin privileges
+
+---
+
+### Security Considerations
+
+#### Best Practices
+
+**? DO:**
+- Only use on trusted, secure computers
+- Verify derived address matches expected
+- Create backup shares immediately after import
+- Test with small amounts before large transactions
+- Keep original mnemonic backup separately
+- Document import in secure external records
+
+**? DON'T:**
+- Enter mnemonics on public/shared computers
+- Share mnemonics via email, chat, or cloud
+- Screenshot the mnemonic during import
+- Import on computers with malware
+- Use the same mnemonic for multiple purposes
+- Store mnemonics in plain text files
+
+#### Encryption Details
+
+Imported mnemonics are secured using:
+- **DPAPI**: Windows Data Protection API (LocalMachine scope)
+- **Registry Storage**: Encrypted in Windows Registry
+- **Administrator-only Access**: Requires admin privileges
+- **No Plain Text**: Never stored unencrypted
+- **Metadata**: Network, address, timestamps stored with encryption
+
+#### Verification Steps
+
+After importing, verify:
+1. ? Derived address matches your expected address
+2. ? Secret appears in Secret Manager
+3. ? Can view secret details (reveals correctly)
+4. ? Metadata is accurate (network, key type)
+5. ? Backup shares created
+6. ? Test transaction succeeds (small amount)
+
+---
+
+### Troubleshooting Import Issues
+
+#### Issue: Word count stays orange/wrong
+
+**Symptoms:**
+- Word count doesn't reach 12
+- Extra spaces, line breaks
+
+**Solution:**
+1. Remove extra spaces, tabs, line breaks
+2. Paste into plain text editor first
+3. Copy again and paste into wizard
+4. Verify 12 words separated by single spaces
+
+#### Issue: "Invalid mnemonic phrase" error
+
+**Symptoms:**
+- Mnemonic looks correct but validation fails
+
+**Solution:**
+1. Verify all words are BIP39 English words
+2. Check for typos (common: "work" vs "word", "from" vs "form")
+3. Try typing manually instead of pasting
+4. Verify original source of mnemonic
+5. Check if it's actually 12 words (not 24-word phrase split)
+
+#### Issue: Derived address doesn't match expected
+
+**Symptoms:**
+- Import succeeds but address is different
+
+**Possible causes:**
+1. **Wrong network selected**: Ethereum vs Solana give different addresses
+2. **Different derivation path**: Other wallets may use non-standard paths
+3. **Wrong mnemonic**: Double-check source
+4. **Passphrase expected**: Some mnemonics use BIP39 passphrase (25th word)
+
+**Solution:**
+1. Verify correct network selected
+2. Compare with original wallet's derivation path
+3. Check if original wallet uses BIP39 passphrase (not currently supported)
+4. Try test transaction to verify
+
+#### Issue: Import succeeds but can't find in Secret Manager
+
+**Symptoms:**
+- Import completes successfully
+- Secret not visible in list
+
+**Solution:**
+1. Click "Refresh" in Secret Manager
+2. Check search filter isn't hiding it
+3. Search by name in Secret Manager
+4. Restart AdminGUI
+5. Check service is running
+
+#### Issue: Permission errors during storage
+
+**Symptoms:**
+- "Access denied" or permission errors
+
+**Solution:**
+1. Run AdminGUI as Administrator:
+   - Right-click app ? Run as Administrator
+2. Verify service is running
+3. Check Windows Registry permissions:
+   - HKLM\SOFTWARE\StampService
+4. Check Event Viewer for detailed errors
 
 ---
 
@@ -864,6 +1256,7 @@ Master these keyboard shortcuts for efficient navigation and operation.
 | Shortcut | Action |
 |----------|--------|
 | `Ctrl+N` | Create New Token |
+| `Ctrl+I` | Import Existing Mnemonic |
 | `Ctrl+M` | Open Secret Manager |
 | `Ctrl+B` | Open Backup & Recovery |
 | `Ctrl+H` | Open Service Health |
@@ -1131,6 +1524,17 @@ Common issues and their solutions.
 - ? Create backups immediately
 - ? Test token before production use
 
+#### 2a. Mnemonic Import
+
+- ? Only import on trusted, secure computers
+- ? Verify derived address matches expected
+- ? Use descriptive names (e.g., `Personal_ETH_Master`)
+- ? Create backup shares immediately after import
+- ? Test with small transaction before trusting
+- ? Keep original mnemonic backup separately
+- ? Never share or screenshot mnemonics
+- ? Document import in secure external records
+
 #### 3. Secret Organization
 
 **Naming Conventions:**
@@ -1261,15 +1665,17 @@ Maintain a list of:
 
 ### Essential Shortcuts
 - `Ctrl+N` - New Token
+- `Ctrl+I` - Import Mnemonic
 - `Ctrl+M` - Secrets
 - `Ctrl+B` - Backup
 - `F5` - Refresh
 
 ### Common Tasks
 1. **Create Token**: Ctrl+N ? Fill form ? Next ? Next ? Finish
-2. **View Secret**: Ctrl+M ? Select ? Enter ? Reveal
-3. **Backup**: Ctrl+B ? Configure ? Select folder ? Create
-4. **Recovery**: Ctrl+B ? Add shares ? Start recovery
+2. **Import Mnemonic**: Ctrl+I ? Enter name & 12 words ? Select type & network ? Next ? Finish
+3. **View Secret**: Ctrl+M ? Select ? Enter ? Reveal
+4. **Backup**: Ctrl+B ? Configure ? Select folder ? Create
+5. **Recovery**: Ctrl+B ? Add shares ? Start recovery
 
 ### Emergency
 - Check Service Health (Ctrl+H)
