@@ -2,6 +2,8 @@
 using System.Data;
 using System.Windows;
 using StampService.AdminGUI.Helpers;
+using StampService.AdminGUI.Services;
+using MaterialDesignThemes.Wpf;
 
 namespace StampService.AdminGUI;
 
@@ -13,6 +15,9 @@ public partial class App : System.Windows.Application
     protected override void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
+
+        // Load settings and apply theme BEFORE showing any windows
+        LoadAndApplySettings();
 
 #if RELEASE
         // Only check for administrator privileges in Release mode
@@ -51,5 +56,37 @@ MessageBox.Show(
       }
 #endif
     }
+
+    private void LoadAndApplySettings()
+    {
+      try
+     {
+      // Load settings (creates default if doesn't exist)
+var settingsManager = SettingsManager.Instance;
+         var settings = settingsManager.Settings;
+
+     // Apply theme
+       var paletteHelper = new PaletteHelper();
+    var theme = paletteHelper.GetTheme();
+
+      if (settings.Theme == "Dark")
+            {
+  theme.SetBaseTheme(BaseTheme.Dark);
+    }
+          else
+            {
+        theme.SetBaseTheme(BaseTheme.Light);
+            }
+
+    paletteHelper.SetTheme(theme);
+
+    System.Diagnostics.Debug.WriteLine($"Settings loaded. Theme: {settings.Theme}");
+        }
+        catch (Exception ex)
+        {
+       System.Diagnostics.Debug.WriteLine($"Error loading settings: {ex.Message}");
+     // Continue with defaults if settings fail to load
+        }
+ }
 }
 

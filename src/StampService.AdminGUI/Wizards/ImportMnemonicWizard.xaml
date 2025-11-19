@@ -85,13 +85,6 @@
  SelectedIndex="0">
                         <ComboBoxItem Content="Ethereum Mainnet"/>
                         <ComboBoxItem Content="Ethereum Testnet (Sepolia)"/>
-                        <!-- <ComboBoxItem Content="Polygon Mainnet"/>
-                        <ComboBoxItem Content="Polygon Testnet (Mumbai)"/>
-                        <ComboBoxItem Content="Binance Smart Chain Mainnet"/>
-                        <ComboBoxItem Content="Binance Smart Chain Testnet"/>
-                        <ComboBoxItem Content="Solana Mainnet"/>
-                        <ComboBoxItem Content="Solana Devnet"/>
-                        <ComboBoxItem Content="Other Network"/> -->
                     </ComboBox>
                 </StackPanel>
 
