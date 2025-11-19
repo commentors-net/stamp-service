@@ -33,6 +33,19 @@
                 </StackPanel>
 
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" DockPanel.Dock="Right">
+                    <Button Style="{StaticResource MaterialDesignRaisedLightButton}"
+                            Click="ViewLogsButton_Click"
+                            ToolTip="View audit logs (Ctrl+L)"
+                            Margin="0,0,8,0">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="TextBox" 
+                                                      Width="18" 
+                                                      Height="18" 
+                                                      VerticalAlignment="Center" 
+                                                      Margin="0,0,4,0"/>
+                            <TextBlock Text="View Logs" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
                     <Button Style="{StaticResource MaterialDesignIconButton}" ToolTip="Help">
                         <materialDesign:PackIcon Kind="HelpCircle"/>
                     </Button>
@@ -206,5 +219,6 @@
         </materialDesign:ColorZone>
     </Grid>
 </Window>
+
 
 

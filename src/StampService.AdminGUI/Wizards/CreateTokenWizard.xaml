@@ -48,12 +48,17 @@
          <TextBlock Text="Network" Margin="0,0,0,8"/>
  <ComboBox x:Name="NetworkComboBox" 
          Style="{StaticResource MaterialDesignOutlinedComboBox}"
-               SelectedIndex="1">
-    <ComboBoxItem Content="Ethereum Mainnet"/>
-      <ComboBoxItem Content="Ethereum Testnet (Sepolia)"/>
-            <ComboBoxItem Content="Polygon Mainnet"/>
+       SelectedIndex="0">
+ <ComboBoxItem Content="Ethereum Mainnet"/>
+    <ComboBoxItem Content="Ethereum Testnet (Sepolia)"/>
+    <!-- Future networks (commented out for now)
+    <ComboBoxItem Content="Polygon Mainnet"/>
     <ComboBoxItem Content="Polygon Testnet (Mumbai)"/>
-      </ComboBox>
+    <ComboBoxItem Content="Binance Smart Chain"/>
+    <ComboBoxItem Content="Solana Mainnet"/>
+    <ComboBoxItem Content="Solana Devnet"/>
+    -->
+</ComboBox>
    </StackPanel>
 
     <!-- Step 2: Generate Keys -->
