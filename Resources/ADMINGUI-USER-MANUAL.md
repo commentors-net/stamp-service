@@ -9,10 +9,12 @@
 6. [Managing Secrets](#managing-secrets)
 7. [Backup & Recovery](#backup--recovery)
 8. [Service Health Monitoring](#service-health-monitoring)
-9. [Settings & Configuration](#settings--configuration)
-10. [Keyboard Shortcuts](#keyboard-shortcuts)
-11. [Troubleshooting](#troubleshooting)
-12. [Best Practices](#best-practices)
+9. [Audit Log Viewer](#audit-log-viewer)
+10. [Settings & Configuration](#settings--configuration)
+11. [Keyboard Shortcuts](#keyboard-shortcuts)
+12. [Known Limitations](#known-limitations)
+13. [Troubleshooting](#troubleshooting)
+14. [Best Practices](#best-practices)
 
 ---
 
@@ -25,8 +27,11 @@ Stamp Service AdminGUI is a Windows desktop application that provides a user-fri
 ### Key Features
 
 - **Token Creation**: Generate new blockchain tokens with automatic key generation
+- **Mnemonic Import**: Import existing 12-word recovery phrases securely
 - **Secret Management**: Store, view, search, and delete sensitive information
+- **Export/Import**: Transfer secrets between systems with encryption options
 - **Backup & Recovery**: Create encrypted backup shares using Shamir's Secret Sharing
+- **Audit Logging**: Track all operations with comprehensive audit logs
 - **Service Monitoring**: Real-time service health and status information
 - **Security**: Administrator privileges required, secure secret storage
 
@@ -710,379 +715,317 @@ Enter any text to filter by:
 
 ### Adding a New Secret
 
-**[SCREENSHOT PLACEHOLDER: Add Secret dialog]**
+You can manually add secrets to the service using the Add Secret dialog.
 
-#### Steps:
-1. Click "Add Secret" button
-2. Fill in the form:
-   - **Name**: Unique identifier
-   - **Type**: Select from dropdown
-   - **Value**: Enter the secret (encrypted on save)
-   - **Network**: Optional network association
-   - **Metadata**: Add custom key-value pairs
+#### Steps to Add a Secret:
 
-3. Click "Save" to store
+1. Click "**+ New Secret**" button in Secret Manager toolbar
+2. The Add Secret dialog opens with the following fields:
 
-> **Note**: Secret values are automatically encrypted before storage.
+**Required Fields:**
+- **Secret Name**: Unique identifier for the secret
+  - Must be unique across all secrets
+  - Example: "Personal_API_Key", "Backup_Wallet_Key"
+  
+- **Secret Type**: Select from dropdown
+  - Mnemonic (12-word recovery phrase)
+  - Private Key (hexadecimal key)
+  - API Key (service authentication)
+  - Password (login credentials)
+  - Other (custom secret type)
+  
+- **Secret Value**: The actual secret data
+  - Entered in a secure text box
+  - Masked during entry
+  - Automatically encrypted before storage
 
-### Deleting Secrets
+**Optional Fields:**
+- **Network**: Blockchain network (Ethereum, Solana, etc.)
 
-<img width="975" height="691" alt="image" src="https://github.com/user-attachments/assets/47d34baa-5f44-49dc-a7b8-b4911d6bed7e" />
+- **Description/Notes**: Additional context or documentation
 
-#### To Delete a Secret:
-1. Select secret(s) in the grid
-2. Click "Delete Secret" button
-3. Confirm deletion in warning dialog
+3. Click "**SAVE**" to store the secret
+4. If a secret with the same name exists, you'll be prompted to:
+   - Overwrite the existing secret
+   - Cancel and choose a different name
 
-> **Warning**: Deletion is permanent! Ensure you have backups before deleting critical secrets.
-
-#### Batch Deletion
-- Hold `Ctrl` and click to select multiple secrets
-- Hold `Shift` and click to select range
-- Click "Delete Secret" to remove all selected
+**Security Features:**
+- Values are never stored in plain text
+- Encrypted using Windows DPAPI before storage
+- Only accessible with administrator privileges
+- Activity is logged to audit trail
 
 ### Exporting Secrets
 
-**[SCREENSHOT PLACEHOLDER: Export options dialog]**
+Export secrets to transfer them between systems or create external backups.
 
 #### Export Options:
-1. **Single Secret**: From Details window, click "Export to File"
-2. **Multiple Secrets**: Select secrets and choose "Export Selected"
-3. **All Secrets**: Use "Export All" option
 
-#### Export Formats:
-- **Encrypted JSON**: Password-protected JSON file
-- **Plain Text**: Unencrypted (?? not recommended)
-- **CSV**: For spreadsheet import
+**From Secret Manager:**
+1. Select secrets in the grid (single or multiple)
+2. Click "**Export**" button in the toolbar
+3. Choose export scope:
+   - **Selected Secrets Only**: Export just the selected items
+   - **All Secrets**: Export entire secret store
 
----
+**Export Formats:**
+1. **Encrypted JSON (Recommended)**
+   - Password-protected with AES-256 encryption
+   - Includes metadata (name, type, network, timestamps)
+   - File extension: `.encrypted`
+   - **Security**: Requires strong password to decrypt
+   - **Use case**: Transferring secrets securely
 
-## Backup & Recovery
+2. **Plain Text JSON (Not Secure)**
+   - Unencrypted JSON format
+   - Human-readable structure
+   - File extension: `.json`
+   - **?? WARNING**: Anyone with file access can read secrets
+   - **Use case**: Only on trusted, encrypted drives
 
-The Backup & Recovery view provides tools for creating encrypted backup shares and recovering secrets from existing shares.
+3. **CSV Spreadsheet (Not Secure)**
+   - Comma-separated values format
+   - Compatible with Excel, Google Sheets
+   - File extension: `.csv`
+   - **?? WARNING**: Secrets stored in plain text
+   - **Use case**: Importing into other tools (use with caution)
 
-<img width="879" height="1065" alt="image" src="https://github.com/user-attachments/assets/08ecacbc-b0e0-4a34-9ced-c19ec2a8bf88" />
+#### Export Process:
 
-### Understanding Shamir's Secret Sharing
+1. **Select Format**: Choose Encrypted JSON, Plain JSON, or CSV
+2. **Configure Encryption** (if Encrypted JSON):
+   - Enter strong password (minimum 8 characters)
+   - Confirm password
+   - Password complexity indicators shown
+   
+3. **Choose Options**:
+   - ?? Include metadata (type, network, timestamps)
+   - ?? Include creation timestamps
+   
+4. **Security Warning**:
+   - For plain text exports, a warning is displayed
+   - Confirm you understand the security implications
+   
+5. **Save Location**: Choose where to save the export file
+6. **Export Complete**: File is created and path is displayed
 
-Shamir's Secret Sharing (SSS) splits a secret into multiple shares where:
-- **Total Shares**: Number of pieces to create (3-10)
-- **Threshold**: Minimum shares needed to recover (2-5)
-- **Security**: Any fewer than threshold shares reveals nothing
+**Post-Export:**
+- Store encrypted exports securely
+- Never email or share unencrypted exports
+- Delete plain text exports after use
+- Document export location for recovery purposes
 
-#### Example Configurations
+### Importing Secrets from File
 
-| Shares | Threshold | Use Case |
-|--------|-----------|----------|
-| 3 | 2 | Personal backup (home, office, bank vault) |
-| 5 | 3 | Team backup (distributed among team members) |
-| 7 | 4 | Enterprise backup (high security) |
+Import previously exported secrets back into the service.
 
-> **Best Practice**: Use 5 shares with threshold 3 for most scenarios.
+#### Import Process:
 
----
+1. Click "**Import**" button in Secret Manager toolbar
+2. The Import Secrets dialog opens
 
-### Creating Backup Shares
+**Step 1: Select File**
+- Click "**BROWSE**" to select a secrets file
+- Supported formats:
+  - Encrypted JSON (`.encrypted`, `.json`)
+  - Plain Text JSON (`.json`, `.txt`)
+  - CSV (`.csv`)
+- File path is displayed after selection
+- Preview shows file metadata and first few lines
 
-<img width="837" height="323" alt="image" src="https://github.com/user-attachments/assets/dfce5c7f-85ef-4af2-9b0e-e1e3af23d29d" />
+**Step 2: Choose Format**
+- **Auto-detect**: Automatically determines file format
+- **Encrypted JSON**: Requires password
+- **Plain Text**: No password needed
+- **CSV**: Column mapping is automatic
 
+**Step 3: Enter Password** (if encrypted)
+- Password panel appears for encrypted files
+- Enter the decryption password
+- Incorrect password will show error message
 
-#### Step-by-Step Process
+**Step 4: Configure Import Options**
+- **Overwrite existing secrets**: Replace secrets with same name
+- **Validate before importing**: Check for errors before importing
+- **Create backup first**: Create backup shares of existing secrets
 
-##### 1. Configure Share Settings
-- **Total Shares**: Select from dropdown (3-10)
-  - Default: 5 shares
-  - More shares = more distribution options
+**Step 5: Preview**
+- File information displayed:
+  - Filename, size, last modified
+  - Number of secrets detected
+  - Sample of secrets (names only, not values)
   
-- **Threshold**: Select from dropdown (2 to Total-1)
-  - Default: 3 shares required
-  - Higher threshold = more security, less convenience
+**Step 6: Import**
+- Click "**IMPORT SECRETS**" to begin import
+- Progress indicator shows import status
+- Success summary displays:
+  - Total secrets in file
+  - Successfully imported
+  - Skipped (duplicates without overwrite)
+  - Failed (errors)
 
+**Post-Import:**
+- Secret Manager refreshes automatically
+- Imported secrets appear in the list
+- Search for imported secrets to verify
+- Check audit log for import activity
 
-##### 2. Select Output Folder
-- Click "Select Output Folder" button
-- Browse to desired backup location
-- Recommended locations:
-  - External USB drive
-  - Network drive
-  - Cloud storage folder
-  - Multiple locations for different shares
-
-##### 3. Create Shares
-- Click "Create Backup Shares" button
-- Progress bar shows creation status
-- Completion message displays total shares created
-
-<img width="854" height="460" alt="image" src="https://github.com/user-attachments/assets/a24ea3c1-d1fa-43ba-860d-ea7ed2401294" />
-
-
-#### Backup Output
-
-The backup folder contains:
-```
-[TokenName]_[Timestamp]/
-??? TokenName_share_1.txt
-??? TokenName_share_2.txt
-??? TokenName_share_3.txt
-??? TokenName_share_4.txt
-??? TokenName_share_5.txt
-??? README.txt (instructions for recovery)
-```
-
-<img width="715" height="408" alt="image" src="https://github.com/user-attachments/assets/a4fcd3f5-4489-410e-b13b-952680d0acb6" />
-
-Each share file contains:
-- Encrypted share data
-- Share number (1 of 5)
-- Threshold requirement (3 shares needed)
-- Creation timestamp
-- Recovery instructions
-
-#### Post-Backup Actions
-
-After creating backups:
-
-1. **Distribute Shares**
-   - Store each share in a different location
-   - Label shares clearly (Share 1 of 5, etc.)
-   - Record storage locations (not on computer!)
-
-2. **Test Recovery**
-   - Select any 3 shares
-   - Perform test recovery
-   - Verify recovered secret matches original
-
-3. **Secure Storage Locations**
-   - Physical: Safe deposit box, fireproof safe, trusted person
-   - Digital: Encrypted cloud storage, password manager
-   - Hybrid: Mix of physical and digital locations
+**Import Validation:**
+- Duplicate names: Prompts for overwrite confirmation
+- Invalid format: Shows detailed error message
+- Missing required fields: Skips invalid entries
+- Metadata mismatch: Warns but continues import
 
 ---
 
-### Recovering from Backup Shares
-
-<img width="834" height="510" alt="image" src="https://github.com/user-attachments/assets/38186578-e488-49b5-8b12-e241e3365b32" />
-
-#### Recovery Process
-
-##### 1. Add Share Files
-
-**Method 1: File Picker**
-- Click "Add Share Files" button
-- Browse to share location
-- Select multiple share files (Ctrl+Click)
-- Click "Open"
-
-**Method 2: Drag & Drop** (if enabled)
-- Drag share files from Windows Explorer
-- Drop onto the share list area
-
-**[SCREENSHOT PLACEHOLDER: Add share files dialog]**
-
-##### 2. Review Added Shares
-
-The share list displays:
-- Share file names
-- File paths
-- Share numbers (parsed from file)
-- Status indicators
-
-<img width="824" height="572" alt="image" src="https://github.com/user-attachments/assets/5c165b3d-cae2-4015-aa3b-cef62b92e47a" />
-
-##### 3. Check Status Indicator
-
-Status bar shows:
-- **Shares Provided**: Number of shares added
-- **Shares Required**: Threshold needed
-- **Status**: 
-  - ?? "Need X more shares" (insufficient)
-  - ? "Ready to recover" (sufficient)
-
-<img width="818" height="602" alt="image" src="https://github.com/user-attachments/assets/fa05f64f-e0fa-4f33-bd12-4e614889f71b" />
-
-
-##### 4. Start Recovery
-
-- Click "Start Recovery" button (enabled when threshold met)
-- Progress dialog shows recovery process
-- Success message confirms recovery
-- Recovered secrets are stored in service
-
-<img width="792" height="550" alt="image" src="https://github.com/user-attachments/assets/fba3bc19-7cb0-40a1-9e50-2db4e7ec4187" />
-
-
-#### Recovery Options
-
-**Remove Share**: Remove a specific share from list
-**Clear All**: Remove all shares and start over
-**Refresh**: Re-scan share files for changes
-
-#### Recovery Verification
-
-After successful recovery:
-
-1. **Check Secret Manager**
-   - Navigate to Secret Manager
-   - Search for recovered secrets
-   - Verify all expected secrets present
-
-2. **Test Functionality**
-   - View secret details
-   - Verify addresses match expected values
-   - Test token functionality if applicable
-
----
-
-### Backup Best Practices
-
-#### Distribution Strategy
-
-**The 3-2-1-1 Rule**:
-- **3** copies of your data (original + 2 backups)
-- **2** different media types (USB + cloud)
-- **1** copy offsite (not in your home/office)
-- **1** copy offline (air-gapped)
-
-#### Storage Recommendations
-
-| Location Type | Examples | Pros | Cons |
-|---------------|----------|------|------|
-| Physical | Safe, deposit box | No internet risk | Fire/theft risk |
-| Digital Cloud | Google Drive, Dropbox | Accessible anywhere | Internet dependent |
-| Trusted Person | Family, lawyer | Redundancy | Trust required |
-| Hardware | USB drive, NAS | Full control | Hardware failure |
-
-#### Labeling Shares
-
-Label each share file/container with:
-- Share number (e.g., "Share 2 of 5")
-- Threshold requirement (e.g., "Need 3 to recover")
-- Creation date
-- Token/secret identifier (if not sensitive)
-- **DO NOT** include passwords or hints
-
-#### Periodic Backup Verification
-
-Schedule regular backup tests:
-- **Monthly**: Verify share files are accessible
-- **Quarterly**: Perform test recovery
-- **Annually**: Refresh backups (create new shares)
-
-#### Emergency Recovery Plan
-
-Document your recovery process:
-1. Where each share is stored
-2. How to access each storage location
-3. Who to contact for shares held by others
-4. Recovery procedure steps
-5. Emergency contact information
-
-> **Store this plan separately from the shares!**
-
----
-
-## Service Health Monitoring
-
-The Service Health view provides real-time diagnostics and monitoring of the Stamp Service.
-
-<img width="881" height="681" alt="image" src="https://github.com/user-attachments/assets/002cbeb1-4786-4cc9-a01a-cf8d7faa6354" />
-
-
-### Service Status Dashboard
-
-#### Status Indicators
-
-**[SCREENSHOT PLACEHOLDER: Status indicator panel]**
-
-- **Service State**: Running / Stopped / Error
-- **Connection Status**: Connected / Disconnected
-- **IPC Status**: Named pipe connection status
-- **Secret Store Status**: Registry access status
-
-#### System Metrics
-
-<img width="823" height="241" alt="image" src="https://github.com/user-attachments/assets/06e1139a-47a6-4237-ad8c-a233607e408c" />
-<img width="820" height="199" alt="image" src="https://github.com/user-attachments/assets/80905ee5-3055-494e-bd37-9dcf9edc6240" />
-
-
-- **Uptime**: Total service run time
-- **Memory Usage**: Service RAM consumption
-- **CPU Usage**: Service processor usage
-- **Secret Count**: Total secrets stored
-- **Operation Count**: Total operations performed
-
-#### Recent Operations
-
-Real-time log of service activities:
-- Timestamp
-- Operation type (Store, Retrieve, Delete, List)
-- Status (Success, Failed, Denied)
-- Details/Error messages
-
-### Service Controls
-
-
-#### Available Actions
-
-1. **Restart Service**
-   - Stops and starts the service
-   - Clears temporary caches
-   - Re-establishes IPC connections
-   - Use if service becomes unresponsive
-
-2. **Clear Cache**
-   - Clears in-memory secret cache
-   - Forces reload from registry
-   - Use if secrets appear out of sync
-
-3. **View Logs**
-   - Opens Windows Event Viewer
-   - Filters to Stamp Service events
-   - Shows detailed diagnostic information
-
-4. **Test Connection**
- - Sends ping to service
-   - Verifies IPC communication
-   - Displays latency information
-
-### Diagnostics Panel
-
-
-#### System Information
-
-- **Service Version**: Current service version
-- **Client Version**: AdminGUI version
-- **IPC Pipe Name**: Named pipe identifier
-- **Registry Path**: Secret storage location
-- **Installation Path**: Service executable location
-
-#### Health Checks
-
-Automated tests:
-- ? Service is running
-- ? IPC connection established
-- ? Registry permissions verified
-- ? Encryption provider available
-- ?? Warnings (if any)
-- ? Errors (if any)
-
-### Troubleshooting Tools
-
-
-#### Connection Test
-- Tests IPC named pipe connection
-- Measures response latency
-- Reports: Success / Timeout / Access Denied / Error
-
-#### Permission Check
-- Verifies administrator privileges
-- Checks registry access rights
-- Validates service permissions
-
-#### Secret Store Integrity
-- Counts secrets in registry
-- Validates encryption
-- Checks for corruption
+## Audit Log Viewer
+
+The Audit Log Viewer provides a comprehensive interface for viewing, searching, and exporting all administrative actions and security events.
+
+### Opening the Audit Log Viewer
+
+**From Main Window:**
+- Click "**View Logs**" button in the header toolbar
+- **Keyboard Shortcut**: `Ctrl+L`
+
+### Audit Log Interface
+
+The Audit Log Viewer displays a searchable, filterable grid of all logged events:
+
+#### Main Components
+
+1. **Filter Panel** (Top)
+   - **Search Box**: Filter logs by text search
+   - **Event Type Filter**: Filter by operation type
+     - All Events
+     - Sign Operations
+     - Share Creation
+     - Recovery Events
+     - Auth Failures
+     - Security Events
+   - **Date Range**: Filter by time period
+     - Today
+  - Last 7 Days
+     - Last 30 Days
+     - All Time
+   - **Apply Filter Button**: Refresh view with current filters
+
+2. **Summary Bar**
+   - Displays: "Showing X of Y log entries"
+   - Updates in real-time as filters change
+
+3. **Log Grid** (Center)
+   - Columns:
+  - **Timestamp**: Date and time of event
+     - **Level**: Information, Warning, Error
+     - **Event Type**: Category of operation
+     - **Details**: Description of action
+   - **Sorting**: Click column headers to sort
+   - **Double-click**: View full details in popup
+
+4. **Action Buttons** (Top-right)
+   - **Open Log Folder**: Opens log directory in File Explorer
+   - **Export**: Export filtered logs to file
+   - **Refresh**: Reload logs from disk
+
+5. **Footer Bar**
+   - Shows log file location path
+   - **Close** button to exit viewer
+
+### Using the Audit Log Viewer
+
+#### Searching Logs
+1. Enter text in search box (searches all columns)
+2. Results filter in real-time as you type
+3. Case-insensitive matching
+4. Searches: event type, details, and raw message
+
+#### Filtering by Event Type
+1. Click Event Type dropdown
+2. Select category:
+   - **Sign Operations**: Token signing events
+   - **Share Creation**: Backup share generation
+   - **Recovery Events**: Secret recovery from shares
+   - **Auth Failures**: Failed authentication attempts
+   - **Security Events**: Access control events
+3. Grid updates to show only selected type
+
+#### Filtering by Date Range
+1. Click Date Range dropdown
+2. Select time period (Today, Last 7 Days, etc.)
+3. Grid shows events within selected range
+
+#### Viewing Full Details
+1. Double-click any log entry
+2. Popup shows:
+   - Full timestamp
+   - Log level
+   - Event type
+   - Complete message details
+3. Click OK to close
+
+#### Exporting Logs
+1. Apply desired filters (date, type, search)
+2. Click "**Export**" button
+3. Choose export format:
+   - **CSV**: Spreadsheet format
+   - **JSON**: Structured data format
+   - **TXT**: Plain text report
+4. Select save location
+5. Confirmation message shows export path
+
+#### Opening Log Folder
+1. Click "**Open Log Folder**" button
+2. Windows Explorer opens to: `C:\ProgramData\StampService\Logs\`
+3. View all log files directly
+
+### Log File Details
+
+#### Log Location
+- Path: `C:\ProgramData\StampService\Logs\`
+- Files: `audit.log`, `service.log`, `stamp-service.log`
+- Format: Serilog structured logging
+
+#### Log Rotation
+- Logs rotate daily
+- Archives: `audit-20250104.log`
+- Retention: 30 days by default
+- Max size: 10 MB per file
+
+#### What Gets Logged
+
+**Security Events:**
+- Secret access (create, read, delete)
+- Authentication attempts
+- Permission changes
+- Configuration changes
+
+**Operational Events:**
+- Service start/stop
+- Token creation/import
+- Backup/recovery operations
+- Health checks
+
+**Error Events:**
+- Failed operations
+- Service errors
+- Connection issues
+- Validation failures
+
+### Security and Compliance
+
+The audit log provides:
+- **Non-repudiation**: Timestamps and user tracking
+- **Forensic trail**: Complete operation history
+- **Compliance**: Meets regulatory logging requirements
+- **Tamper detection**: Logs are append-only
+
+**Best Practices:**
+- Review logs weekly for suspicious activity
+- Export logs monthly for off-system retention
+- Monitor for failed authentication attempts
+- Track secret access patterns
+- Archive logs for compliance requirements (if applicable)
 
 ---
 
@@ -1090,181 +1033,136 @@ Automated tests:
 
 The Settings window allows you to customize the AdminGUI behavior and appearance.
 
+**?? Note**: Settings functionality is currently basic. Most settings are saved but not all features are fully implemented yet.
 
-### General Settings
+### Opening Settings
 
+- Click the **Settings** button (gear icon) in the main window header
+- **Keyboard Shortcut**: `Ctrl+,`
 
-#### Application Behavior
+### Available Settings
 
-- **Start with Windows**
-  - ? Launch AdminGUI on Windows startup
-  - ? Start minimized to system tray
+#### General Settings
 
-- **Confirmations**
-  - ? Confirm before deleting secrets
-  - ? Confirm before revealing secrets
-  - ? Confirm on application exit
+**Application Behavior:**
+- **Auto-Refresh**: Automatically update status displays
+  - Toggle: Enable/Disable
+  - Refresh interval: 15-300 seconds (slider)
+  - Default: Every 30 seconds
 
-- **Auto-Refresh**
-  - ? Enable automatic status refresh
-  - Interval: `30` seconds (5-300)
+**Confirmations:**
+- **Confirm before deleting secrets**: Show warning dialog
+  - Recommended: ?? Enabled
+  - Prevents accidental deletion
 
-#### Default Backup Settings
+**Notifications:**
+- **Show operation completion notifications**
+  - Toast notifications for import, export, backup operations
 
-- **Total Shares**: `5` (3-10)
-- **Threshold**: `3` (2-Total-1)
-- **Output Folder**: `C:\ProgramData\StampService\Backups`
+#### Appearance Settings
 
-### Appearance Settings
+**Theme:**
+- Light Theme (Current default)
+- Dark Theme (Selection saves but theme doesn't change yet)
+- System Theme (Follows Windows theme - not yet implemented)
 
+**?? Known Limitation**: Theme selection saves to settings but doesn't actually change the application theme yet. This feature is planned for a future update.
 
-#### Theme
+#### Security Settings (Planned)
 
-- ? Dark Theme
-- ? Light Theme
-- ?? System Theme (follows Windows)
+The following settings are shown in the UI but not yet fully functional:
 
-#### Colors
+- Auto-hide secrets after X seconds
+- Require re-authentication before viewing secrets
+- Auto-clear clipboard after copying
+- Warn when copying secrets to clipboard
 
-- **Primary Color**: Material Design palette
-- **Accent Color**: Button and highlight color
-- **Preview**: Live preview of selected theme
+These will be implemented in future versions.
 
-#### Font
+### Saving Settings
 
-- **Font Family**: Segoe UI (default)
-- **Font Size**: 12 pt (8-24)
-- **Use Monospace for Secrets**: ?
+1. Adjust settings as desired
+2. Click "**Save**" to apply and close
+3. Click "**Cancel**" to discard changes
+4. Click "**Reset to Defaults**" to restore original settings
 
-### Security Settings
+**Settings Persistence:**
+- Settings are saved to: `%APPDATA%\StampService\settings.json`
+- Loaded automatically on application startup
+- Backed up with each save
 
+### Current Limitations
 
-#### Secret Display
+The following settings features are planned but not yet implemented:
 
-- **Auto-Hide Secrets After**: `30` seconds (0=never)
-- **Require Re-Authentication**: ? Before viewing secrets
-- **Hide Secrets in Screenshots**: ? (Windows 11 only)
+- ? **Theme Switching**: Selection saves but doesn't apply visually
+- ? **Default Backup Settings**: Not connected to backup wizard yet
+- ? **Advanced Security Options**: Clipboard security, auto-hide, etc.
+- ? **Network Configuration**: Custom networks cannot be added yet
+- ? **Audit Log Settings**: Export audit log, log filtering
 
-#### Clipboard
-
-- **Auto-Clear Clipboard After**: `60` seconds
-- **Warn When Copying Secrets**: ?
-- **Disable Copy to Clipboard**: ?
-
-#### Audit
-
-- **Log All Secret Access**: ?
-- **Log Search Queries**: ?
-- **Export Audit Log**: [Button]
-
-### Network Settings
-
-
-#### Service Connection
-
-- **IPC Pipe Name**: `StampServicePipe` (default)
-- **Connection Timeout**: `5000` ms
-- **Retry Attempts**: `3`
-
-#### Default Networks
-
-Customize network dropdown options:
-- ? Ethereum Mainnet
-- ? Ethereum Testnet
-- ? Binance Smart Chain
-- ? Polygon
-- ? Solana Mainnet
-- ? Solana Devnet
-- ? Custom Networks...
-
-### Advanced Settings
-
-
-#### Developer Options
-
-- ? Enable Debug Logging
-- ? Show Internal IPC Messages
-- ? Display Error Stack Traces
-
-#### Performance
-
-- **Secret Cache Size**: `100` entries
-- **Cache Expiration**: `300` seconds
-- **Lazy Load Secrets**: ?
-
-#### Maintenance
-
-- **Clear Cache**: [Button]
-- **Reset to Defaults**: [Button]
-- **Repair Registry Permissions**: [Button]
-
-### Applying Settings
-
-
-- **Save**: Save changes and close
-- **Apply**: Save without closing
-- **Cancel**: Discard changes and close
-- **Reset**: Revert to last saved settings
+These features are on the roadmap and will be added in upcoming releases.
 
 ---
 
-## Keyboard Shortcuts
+## Known Limitations
 
-Master these keyboard shortcuts for efficient navigation and operation.
+This section documents current limitations and features planned for future releases.
 
+### Feature Status
 
-### Global Shortcuts
+**? Fully Implemented:**
+- Main Dashboard and status display
+- Create Token wizard (4 steps, all functional)
+- Import Mnemonic wizard (3 steps, all functional)
+- Secret Manager (view, search, delete, add)
+- Secret Details (view, reveal, copy)
+- Export Secrets (Encrypted JSON, Plain JSON, CSV)
+- Import Secrets (from file, with validation)
+- Backup & Recovery (real Shamir Secret Sharing implementation)
+- Service Health Monitoring
+- Audit Log Viewer (comprehensive logging and export)
+- Keyboard shortcuts
+- Add Secret dialog
 
-| Shortcut | Action |
-|----------|--------|
-| `Ctrl+N` | Create New Token |
-| `Ctrl+I` | Import Existing Mnemonic |
-| `Ctrl+M` | Open Secret Manager |
-| `Ctrl+B` | Open Backup & Recovery |
-| `Ctrl+H` | Open Service Health |
-| `Ctrl+,` | Open Settings |
-| `F5` | Refresh Current View |
-| `Alt+F4` | Exit Application |
-| `Esc` | Close Dialog/Cancel |
+**?? Partially Implemented:**
+- Settings Window (saves settings but limited feature application)
+- Theme selection (saves preference but doesn't change UI yet)
 
-### Secret Manager Shortcuts
+**? Planned for Future Releases:**
+- Dynamic theme switching (Light/Dark/System)
+- Clipboard auto-clear with timer
+- Advanced security settings (auto-hide secrets, re-authentication)
+- Custom network configuration
+- Enhanced help system (context-sensitive, searchable)
+- Application custom icon
 
-| Shortcut | Action |
-|----------|--------|
-| `Ctrl+F` | Focus Search Box |
-| `Enter` | View Selected Secret |
-| `Delete` | Delete Selected Secret(s) |
-| `Ctrl+C` | Copy Selected Secret Name |
-| `Ctrl+A` | Select All Secrets |
-| `Ctrl+R` | Refresh Secret List |
-| `?/?` | Navigate Secret List |
+### Workarounds for Limited Features
 
-### Secret Details Window
+**Theme Preference:**
+- Current: Application uses light theme by default
+- Workaround: Settings save your preference for when feature is implemented
+- Planned: v1.1 release
 
-| Shortcut | Action |
-|----------|--------|
-| `Ctrl+H` | Toggle Hide/Reveal Secret |
-| `Ctrl+C` | Copy Secret to Clipboard |
-| `Ctrl+E` | Export Secret to File |
-| `Esc` | Close Window |
+**Clipboard Security:**
+- Current: Clipboard doesn't auto-clear
+- Workaround: Manually clear clipboard after copying secrets
+- Best Practice: Copy > Use > Manually paste something else to clear
 
-### Wizard Navigation
+**Custom Networks:**
+- Current: Predefined networks only (Ethereum, Solana, etc.)
+- Workaround: Use "Other" network type and document in metadata
+- Planned: Network configuration dialog in v1.2
 
-| Shortcut | Action |
-|----------|--------|
-| `Alt+N` | Next Step |
-| `Alt+B` | Previous Step |
-| `Alt+C` | Cancel Wizard |
-| `Alt+F` | Finish Wizard |
+### Known Issues
 
-### Backup & Recovery
+**None currently reported.**
 
-| Shortcut | Action |
-|----------|--------|
-| `Ctrl+O` | Add Share Files |
-| `Delete` | Remove Selected Share |
-| `Ctrl+Shift+Delete` | Clear All Shares |
-| `Ctrl+S` | Start Recovery |
+If you encounter issues, please report them via GitHub Issues with:
+- Steps to reproduce
+- Expected vs actual behavior
+- Screenshots if applicable
+- Log files from Audit Log Viewer
 
 ---
 
@@ -1450,32 +1348,51 @@ Common issues and their solutions.
 - ? Update backups after any changes
 - ? Document share storage locations (securely!)
 
-#### 4. Clipboard Safety
+#### 4. **Export/Import Safety**
 
-- ? Enable auto-clear clipboard
-- ? Never paste secrets in unsecured applications
-- ? Clear clipboard manually after sensitive operations
-- ? Be aware of clipboard monitoring software
-- ? Prefer export-to-file over copy-paste
+**When Exporting:**
+- ? Use Encrypted JSON format with strong passwords
+- ? Never export to cloud storage in plain text
+- ? Delete plain text exports immediately after use
+- ? Document export locations securely
+- ? Test encrypted exports can be decrypted
+
+**When Importing:**
+- ? Verify source file is trusted
+- ? Use "Validate before importing" option
+- ? Check for duplicate names before overwrite
+- ? Create backup before bulk imports
+- ? Review import summary for errors
+
+#### 5. **Audit Log Monitoring**
+
+- ? Review audit logs weekly for suspicious activity
+- ? Export logs monthly for off-system retention
+- ? Monitor for repeated failed operations
+- ? Track secret access patterns
+- ? Archive logs for compliance (if required)
 
 ### Operational Best Practices
 
 #### 1. Regular Maintenance
 
 **Weekly:**
-- Review recent activity log
+- Review recent activity log (Dashboard and Audit Logs)
 - Verify service status
 - Check disk space
+- Review failed operations in audit log
 
 **Monthly:**
 - Test backup recovery
 - Audit secret list (remove obsolete)
+- Export audit logs for retention
 - Check for application updates
 
 **Quarterly:**
 - Refresh all backup shares
 - Verify share storage locations
 - Test emergency recovery procedures
+- Review and update documentation
 
 #### 2. Token Creation
 
@@ -1485,7 +1402,7 @@ Common issues and their solutions.
 - ? Create backups immediately
 - ? Test token before production use
 
-#### 2a. Mnemonic Import
+#### 2a. **Mnemonic Import**
 
 - ? Only import on trusted, secure computers
 - ? Verify derived address matches expected
@@ -1496,7 +1413,28 @@ Common issues and their solutions.
 - ? Never share or screenshot mnemonics
 - ? Document import in secure external records
 
-#### 3. Secret Organization
+#### 2b. **Secret Import from Files**
+
+**Planning:**
+- ? Review file format before import
+- ? Check for naming conflicts
+- ? Create backup before bulk import
+- ? Test with small subset first
+
+**Execution:**
+- ? Use encrypted format when transferring between systems
+- ? Validate before importing (enable option)
+- ? Review import summary for errors
+- ? Verify imported secrets in Secret Manager
+- ? Delete import file after successful import
+
+**Post-Import:**
+- ? Create backup shares of critical imported secrets
+- ? Update external documentation
+- ? Test imported secrets work correctly
+- ? Archive original import file securely (if needed)
+
+#### 3. **Secret Organization**
 
 **Naming Conventions:**
 - `PROD_ETH_Master` - Production Ethereum Master
@@ -1510,7 +1448,7 @@ Common issues and their solutions.
 - `Created`: Auto-populated timestamp
 - `LastUsed`: Track usage
 
-#### 4. Documentation
+#### 4. **Documentation**
 
 Maintain external documentation:
 - Token inventory spreadsheet
@@ -1518,58 +1456,8 @@ Maintain external documentation:
 - Recovery contact list
 - Network and address registry
 - Change log
-
-> **Important**: Store documentation separately from secrets!
-
-### Disaster Recovery
-
-#### Preparation
-
-1. **Backup Strategy**
-   - Create shares for all critical secrets
-   - Distribute shares appropriately
-   - Document share locations
-
-2. **Recovery Documentation**
-   - Write step-by-step recovery procedures
-   - Identify required shares for each secret
-   - List contact information for share holders
-
-3. **Testing**
-   - Quarterly recovery drills
-   - Document test results
-   - Update procedures based on lessons learned
-
-#### Recovery Scenarios
-
-**Scenario 1: Computer Failure**
-1. Install AdminGUI on new computer
-2. Collect backup shares
-3. Use Recovery to restore secrets
-4. Verify all secrets recovered
-5. Update documentation
-
-**Scenario 2: Secret Corruption**
-1. Identify affected secrets
-2. Locate corresponding backup shares
-3. Recover from shares
-4. Verify recovered secrets
-5. Delete corrupted entries
-
-**Scenario 3: Lost Shares**
-1. Identify which shares are missing
-2. Check if threshold still met with remaining shares
-3. If yes: recover and create new backup
-4. If no: initiate emergency procedures
-
-#### Emergency Contacts
-
-Maintain a list of:
-- Share holders and contact information
-- IT support contacts
-- Crypto asset recovery services
-- Legal counsel (if applicable)
-- Insurance provider (if applicable)
+- **Export/Import tracking**: Log file transfers between systems
+- **Audit log archives**: Off-system log storage locations
 
 ---
 
@@ -1592,15 +1480,16 @@ Maintain a list of:
 | Application | `C:\Program Files\StampService\AdminGUI\` |
 | Service | `C:\Program Files\StampService\` |
 | Backups | `C:\ProgramData\StampService\Backups\` |
+| Logs | `C:\ProgramData\StampService\Logs\` |
+| Audit Logs | `C:\ProgramData\StampService\Logs\audit.log` |
+| Settings | `%APPDATA%\StampService\settings.json` |
 | Registry | `HKLM\SOFTWARE\StampService\Secrets` |
-| Logs | Windows Event Viewer ? Application |
 
 ### C. Support Resources
 
 - **Documentation**: `https://github.com/commentors-net/stamp-service`
 - **Issue Tracker**: `https://github.com/commentors-net/stamp-service/issues`
 - **Wiki**: `https://github.com/commentors-net/stamp-service/wiki`
-- **Email**: [Support email if available]
 
 ### D. Glossary
 
@@ -1611,38 +1500,43 @@ Maintain a list of:
 - **Public Address**: Blockchain address derived from private key
 - **Shamir's Secret Sharing**: Cryptographic method to split secrets
 - **Threshold**: Minimum shares needed to recover original secret
+- **Audit Log**: Tamper-evident record of all administrative actions
+- **CSV**: Comma-Separated Values, spreadsheet data format
+- **Export**: Save secrets to external file
+- **Import**: Load secrets from external file
 
 ### E. Version History
 
 | Version | Date | Changes |
 |---------|------|---------|
-| 1.0.0 | TBD | Initial release |
+| 1.0.0 | 2025-01-04 | Initial release with all core features |
+|  |  | - Token Creation wizard |
+|  |  | - Mnemonic Import wizard |
+|  |  | - Secret Manager with Add/Export/Import |
+|  |  | - Real Shamir Secret Sharing (Backup/Recovery) |
+|  |  | - Audit Log Viewer |
+|  |  | - Service Health monitoring |
+|  |  | - Basic Settings (saves preferences) |
 
 ---
 
-## Quick Reference Card
+## Feature Roadmap
 
-**[SCREENSHOT PLACEHOLDER: Printable quick reference card]**
+### Current Version (1.0.0)
+All core features implemented and functional.
 
-### Essential Shortcuts
-- `Ctrl+N` - New Token
-- `Ctrl+I` - Import Mnemonic
-- `Ctrl+M` - Secrets
-- `Ctrl+B` - Backup
-- `F5` - Refresh
+### Planned (v1.1 - Q1 2025)
+- ? Dynamic theme switching (Light/Dark/System)
+- ? Enhanced settings persistence and application
+- ? Clipboard auto-clear security
+- ? Advanced help system (searchable, context-sensitive)
 
-### Common Tasks
-1. **Create Token**: Ctrl+N ? Fill form ? Next ? Next ? Finish
-2. **Import Mnemonic**: Ctrl+I ? Enter name & 12 words ? Select type & network ? Next ? Finish
-3. **View Secret**: Ctrl+M ? Select ? Enter ? Reveal
-4. **Backup**: Ctrl+B ? Configure ? Select folder ? Create
-5. **Recovery**: Ctrl+B ? Add shares ? Start recovery
-
-### Emergency
-- Check Service Health (Ctrl+H)
-- Restart Service (Services.msc)
-- Run as Administrator
-- Collect backup shares
+### Future Versions (v1.2+)
+- ? Custom network configuration
+- ? Batch operations (bulk delete, bulk export)
+- ? Secret templates and presets
+- ? Multi-user support with role-based access
+- ? Integration with hardware security modules (HSM)
 
 ---
 
