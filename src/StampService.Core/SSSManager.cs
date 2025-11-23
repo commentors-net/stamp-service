@@ -5,7 +5,7 @@ using StampService.Core.Models;
 namespace StampService.Core;
 
 /// <summary>
-/// Shamir Secret Sharing Manager
+/// Cryptographic Secret Sharing Manager
 /// Implements threshold secret sharing for key backup and recovery
 /// </summary>
 public class SSSManager
@@ -13,7 +13,7 @@ public class SSSManager
     private readonly Random _random = new Random();
     
     /// <summary>
-    /// Create shares from a secret using Shamir's Secret Sharing
+    /// Create shares from a secret using cryptographic secret sharing
     /// </summary>
     public ShareBundle CreateShares(byte[] secret, int totalShares, int threshold, string publicKey, string algorithm)
     {

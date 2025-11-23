@@ -311,16 +311,6 @@ public partial class SecretManagerView : Window
         }
     }
 
-    private async void NewSecretButton_Click(object sender, RoutedEventArgs e)
-    {
-        var dialog = new AddSecretDialog();
-        dialog.Owner = this;
-        if (dialog.ShowDialog() == true)
-        {
-            _ = LoadSecrets(); // Refresh list
-        }
-    }
-
     private void ImportButton_Click(object sender, RoutedEventArgs e)
     {
         var dialog = new ImportSecretsDialog();
@@ -328,10 +318,10 @@ public partial class SecretManagerView : Window
         if (dialog.ShowDialog() == true && dialog.ImportSuccessful)
         {
             MessageBox.Show(
-         $"Successfully imported {dialog.ImportedCount} secret(s)!",
-                    "Import Complete",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Information);
+                $"Successfully imported {dialog.ImportedCount} secret(s)!",
+                "Import Complete",
+                MessageBoxButton.OK,
+                MessageBoxImage.Information);
 
             _ = LoadSecrets(); // Refresh list
         }

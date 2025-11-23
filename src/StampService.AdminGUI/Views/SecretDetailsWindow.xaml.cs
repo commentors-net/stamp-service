@@ -88,8 +88,22 @@ RevealButton.Content = "?? Hide Secret";
 
     private void ExportButton_Click(object sender, RoutedEventArgs e)
     {
-        MessageBox.Show("Export functionality coming soon!", "Coming Soon", 
-      MessageBoxButton.OK, MessageBoxImage.Information);
+        // Create export dialog with this single secret
+        var exportDialog = new ExportSecretsDialog
+        {
+            Owner = this,
+            SecretsToExport = new List<SecretItem> { _secret },
+            ExportAll = false // Only exporting this one secret
+        };
+
+        if (exportDialog.ShowDialog() == true)
+        {
+            MessageBox.Show(
+                $"? Secret '{_secret.Name}' exported successfully!",
+                "Export Complete",
+                MessageBoxButton.OK,
+                MessageBoxImage.Information);
+        }
     }
 
     private void CloseButton_Click(object sender, RoutedEventArgs e)

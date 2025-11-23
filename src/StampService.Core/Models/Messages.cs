@@ -93,7 +93,7 @@ public class ShareCreationOptions
 }
 
 /// <summary>
-/// A single Shamir share
+/// A single cryptographic share
 /// </summary>
 public class Share
 {
