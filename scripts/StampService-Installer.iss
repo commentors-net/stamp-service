@@ -17,7 +17,7 @@ AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
-DefaultDirName={commonpf}\StampService
+DefaultDirName={commonpf}\AegisMint
 DefaultGroupName={#MyAppName}
 AllowNoIcons=yes
 LicenseFile=..\LICENSE.txt
@@ -59,7 +59,7 @@ Name: "{commonappdata}\StampService\Logs"; Permissions: users-modify
 
 [Icons]
 Name: "{group}\Admin CLI"; Filename: "cmd.exe"; Parameters: "/k cd /d ""{app}\AdminCLI"""; WorkingDir: "{app}\AdminCLI"
-Name: "{group}\Service Logs"; Filename: "{commonappdata}\StampService\Logs"
+Name: "{group}\Service Logs"; Filename: "{commonappdata}\AegisMint\Logs"
 Name: "{group}\Documentation"; Filename: "{app}\README.md"
 Name: "{group}\Uninstall {#MyAppName}"; Filename: "{uninstallexe}"
 
@@ -82,7 +82,7 @@ Filename: "sc.exe"; Parameters: "stop {#MyServiceName}"; Flags: runhidden
 Filename: "sc.exe"; Parameters: "delete {#MyServiceName}"; Flags: runhidden
 
 [UninstallDelete]
-Type: filesandordirs; Name: "{commonappdata}\StampService"
+Type: filesandordirs; Name: "{commonappdata}\AegisMint"
 
 [Code]
 function ServiceExists: Boolean;

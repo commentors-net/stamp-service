@@ -6,7 +6,7 @@
 [![Windows](https://img.shields.io/badge/Windows-Service-0078D6)](https://docs.microsoft.com/windows/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-**Generates and holds a master private key inside a secure process, never exposes the key, supports Shamir Secret Sharing backups, and provides a secure local API for Windows client apps to request cryptographic signatures.**
+**Generates and holds a master private key inside a secure process, never exposes the key, supports cryptographic secret sharing backups, and provides a secure local API for Windows client apps to request cryptographic signatures.**
 
 ---
 
@@ -16,7 +16,7 @@ A Windows service that acts like a **hardware security module (HSM)**:
 
 - 🔐 Master signing key generated once and stored securely (never exported)
 - ✍️ Client apps submit requests → service returns cryptographic signatures
-- 💾 Master key backups via **Shamir's Secret Sharing** (distributed to custodians)
+- 💾 Master key backups via **Cryptographic Secret Sharing** (distributed to custodians)
 - 🔄 Key recovery from threshold shares (e.g., 3 of 5 needed)
 
 **Use Cases**: Token minting, approval workflows, multi-signature systems, audit trails, cryptographic stamping
@@ -113,7 +113,7 @@ Client Apps → Named Pipes → Windows Service → DPAPI-encrypted Key
     ↓
           Audit Logging
      ↓
-     Shamir Shares (Offline Backup)
+     Cryptographic Shares (Offline Backup)
 ```
 
 ### Components
@@ -121,7 +121,7 @@ Client Apps → Named Pipes → Windows Service → DPAPI-encrypted Key
 | Component | Type | Purpose |
 |-----------|------|---------|
 | **StampService** | Windows Service | Main service executable |
-| **StampService.Core** | Library | Business logic, crypto, SSS |
+| **StampService.Core** | Library | Business logic, crypto, secret sharing |
 | **StampService.ClientLib** | Library | Client integration (NuGet) |
 | **StampService.AdminCLI** | Tool | Administration CLI |
 
@@ -132,7 +132,7 @@ Client Apps → Named Pipes → Windows Service → DPAPI-encrypted Key
 ## ✨ Features
 
 ### Security
-- Windows DPAPI encryption • Shamir Secret Sharing backup • Named Pipes (local-only)
+- Windows DPAPI encryption • Cryptographic secret sharing backup • Named Pipes (local-only)
 - Comprehensive audit logging • Private key never exported
 
 ### Cryptography

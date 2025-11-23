@@ -1,7 +1,7 @@
-; Inno Setup Script for Stamp Service Admin GUI
+; Inno Setup Script for Aegis Mint Admin GUI
 ; Creates a professional installer for the AdminGUI application
 
-#define MyAppName "Stamp Service Admin GUI"
+#define MyAppName "Aegis Mint Admin GUI"
 #define MyAppVersion "1.0.0"
 #define MyAppPublisher "Your Organization"
 #define MyAppURL "https://github.com/commentors-net/stamp-service"
@@ -22,7 +22,7 @@ DefaultGroupName={#MyAppName}
 AllowNoIcons=yes
 LicenseFile=..\LICENSE.txt
 OutputDir=..\
-OutputBaseFilename=StampService-AdminGUI-Setup-{#MyAppVersion}
+OutputBaseFilename=AegisMint-AdminGUI-Setup-{#MyAppVersion}
 Compression=lzma2/max
 SolidCompression=yes
 PrivilegesRequired=admin
@@ -56,14 +56,14 @@ Source: "..\Resources\POLISH-QUICK-REF.md"; DestDir: "{app}\Docs"; Flags: ignore
 
 [Icons]
 ; Start Menu shortcuts
-Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; WorkingDir: "{app}"; IconFilename: "{app}\{#MyAppExeName}"; Comment: "Manage Stamp Service"
+Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; WorkingDir: "{app}"; IconFilename: "{app}\{#MyAppExeName}"; Comment: "Manage Aegis Mint"
 Name: "{group}\Documentation"; Filename: "{app}\Docs"; Comment: "View documentation"
 Name: "{group}\Logs Folder"; Filename: "{commonappdata}\StampService\Logs"; Comment: "View service logs"
-Name: "{group}\Complete Uninstaller"; Filename: "powershell.exe"; Parameters: "-ExecutionPolicy Bypass -File ""{app}\Scripts\Complete-Uninstaller.ps1"""; WorkingDir: "{app}\Scripts"; IconIndex: 0; Comment: "Remove all Stamp Service components"
+Name: "{group}\Complete Uninstaller"; Filename: "powershell.exe"; Parameters: "-ExecutionPolicy Bypass -File ""{app}\Scripts\Complete-Uninstaller.ps1"""; WorkingDir: "{app}\Scripts"; IconIndex: 0; Comment: "Remove all Aegis Mint components"
 Name: "{group}\{cm:UninstallProgram,{#MyAppName}}"; Filename: "{uninstallexe}"
 
 ; Desktop shortcut
-Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon; WorkingDir: "{app}"; IconFilename: "{app}\{#MyAppExeName}"; Comment: "Manage Stamp Service"
+Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon; WorkingDir: "{app}"; IconFilename: "{app}\{#MyAppExeName}"; Comment: "Manage Aegis Mint"
 
 ; Quick Launch shortcut
 Name: "{userappdata}\Microsoft\Internet Explorer\Quick Launch\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: quicklaunchicon; WorkingDir: "{app}"
@@ -92,9 +92,9 @@ begin
   begin
     if not IsStampServiceInstalled then
     begin
-      MsgBox('Note: The Stamp Service does not appear to be installed.' + #13#10 + #13#10 +
-     'The Admin GUI requires the Stamp Service to be installed and running.' + #13#10 + #13#10 +
-     'Please install the Stamp Service before using the Admin GUI.' + #13#10 + #13#10 +
+      MsgBox('Note: The Aegis Mint service does not appear to be installed.' + #13#10 + #13#10 +
+     'The Admin GUI requires the Aegis Mint service to be installed and running.' + #13#10 + #13#10 +
+     'Please install the Aegis Mint service before using the Admin GUI.' + #13#10 + #13#10 +
      'You can still use this application to connect to a remote service.',
       mbInformation, MB_OK);
     end;
@@ -126,6 +126,6 @@ end;
 [Messages]
 ; Custom messages
 WelcomeLabel1=Welcome to the [name] Setup Wizard
-WelcomeLabel2=This will install the Stamp Service Admin GUI on your computer.%n%nThe Admin GUI provides a professional interface for managing the Stamp Service, including:%n%n• Service health monitoring%n• Secret management%n• Backup and recovery operations%n• Token creation wizards%n%nIt is recommended that you close all other applications before continuing.
+WelcomeLabel2=This will install the Aegis Mint Admin GUI on your computer.%n%nThe Admin GUI provides a professional interface for managing Aegis Mint, including:%n%n• Service health monitoring%n• Secret management%n• Backup and recovery operations%n• Token creation wizards%n%nIt is recommended that you close all other applications before continuing.
 FinishedHeadingLabel=Completing the [name] Setup Wizard
 FinishedLabel=The Admin GUI has been installed on your computer.%n%nYou can launch the application from the Start Menu or Desktop shortcut.%n%nNote: The Admin GUI requires Administrator privileges to function correctly.

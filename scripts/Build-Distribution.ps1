@@ -137,8 +137,8 @@ $DistReadme = @"
 3. Run: ``.\Install-StampService.ps1``
 
 The installer will:
-- Copy files to C:\Program Files\StampService
-- Create data directory at C:\ProgramData\StampService
+- Copy files to C:\Program Files\AegisMint
+- Create data directory at C:\ProgramData\AegisMint
 - Install and start the Windows Service
 - Create desktop shortcut for AdminGUI
 
@@ -219,7 +219,7 @@ Console.WriteLine($"Signature: {response.Signature}");
 
 - The service runs under LocalSystem by default
 - Master key is encrypted with Windows DPAPI
-- All operations are logged to C:\ProgramData\StampService\Logs\
+- All operations are logged to C:\ProgramData\AegisMint\Logs\
 - Backup shares should be stored offline in secure locations
 - Require threshold shares (e.g., 3 of 5) for key recovery
 - AdminGUI requires administrator privileges

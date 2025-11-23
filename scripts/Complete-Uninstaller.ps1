@@ -167,26 +167,26 @@ function Remove-ProgramFiles {
     switch ($Component) {
         "Service" {
             $paths = @(
-       "${env:ProgramFiles}\StampService",
-     "${env:ProgramFiles(x86)}\StampService"
+       "${env:ProgramFiles}\AegisMint",
+     "${env:ProgramFiles(x86)}\AegisMint"
     )
         }
         "AdminGUI" {
             $paths = @(
-          "${env:ProgramFiles}\StampService\AdminGUI",
-      "${env:ProgramFiles(x86)}\StampService\AdminGUI"
+          "${env:ProgramFiles}\AegisMint\AdminGUI",
+      "${env:ProgramFiles(x86)}\AegisMint\AdminGUI"
             )
  }
         "AdminCLI" {
        $paths = @(
-      "${env:ProgramFiles}\StampService\AdminCLI",
-"${env:ProgramFiles(x86)}\StampService\AdminCLI"
+      "${env:ProgramFiles}\AegisMint\AdminCLI",
+"${env:ProgramFiles(x86)}\AegisMint\AdminCLI"
    )
         }
         "All" {
             $paths = @(
-    "${env:ProgramFiles}\StampService",
-                "${env:ProgramFiles(x86)}\StampService"
+    "${env:ProgramFiles}\AegisMint",
+                "${env:ProgramFiles(x86)}\AegisMint"
             )
     }
     }
@@ -213,7 +213,7 @@ function Remove-ProgramFiles {
 function Remove-DataFolder {
     Write-Step "Removing data folder..."
     
-    $dataPath = "${env:ProgramData}\StampService"
+    $dataPath = "${env:ProgramData}\AegisMint"
     
     if (Test-Path $dataPath) {
         $items = Get-ChildItem -Path $dataPath -Recurse | Measure-Object
@@ -348,9 +348,9 @@ function Show-WhatWillBeRemoved {
     Write-Host "Program Files:" -ForegroundColor Yellow
   
     $paths = @(
-   "${env:ProgramFiles}\StampService",
-        "${env:ProgramFiles}\StampService\AdminGUI",
-        "${env:ProgramFiles}\StampService\AdminCLI"
+   "${env:ProgramFiles}\AegisMint",
+        "${env:ProgramFiles}\AegisMint\AdminGUI",
+        "${env:ProgramFiles}\AegisMint\AdminCLI"
     )
     
     foreach ($path in $paths) {
@@ -367,7 +367,7 @@ function Show-WhatWillBeRemoved {
     # Check Data Folder
     Write-Host ""
     Write-Host "Data Folder:" -ForegroundColor Yellow
-    $dataPath = "${env:ProgramData}\StampService"
+    $dataPath = "${env:ProgramData}\AegisMint"
     if (Test-Path $dataPath) {
         $items = (Get-ChildItem -Path $dataPath -Recurse | Measure-Object).Count
         $size = (Get-ChildItem -Path $dataPath -Recurse -File | Measure-Object -Property Length -Sum).Sum
@@ -416,7 +416,7 @@ if (Test-Path $logsPath) {
     Write-Host "Shortcuts:" -ForegroundColor Yellow
     $shortcuts = @(
         "${env:PUBLIC}\Desktop\Stamp Service Admin GUI.lnk",
-     "${env:ProgramData}\Microsoft\Windows\Start Menu\Programs\Stamp Service Admin GUI"
+     "${env:ProgramData}\Microsoft\Windows\Start Menu\Programs\Aegis Mint Admin GUI"
     )
     
     $foundShortcut = $false
@@ -491,7 +491,7 @@ function Uninstall-All {
     }
  else {
    Write-Step "Preserving data folder..."
-        Write-Success "Data folder preserved at: ${env:ProgramData}\StampService"
+        Write-Success "Data folder preserved at: ${env:ProgramData}\AegisMint"
     }
     
     # 6. Remove shares folder (if requested)
@@ -513,7 +513,7 @@ function Uninstall-All {
   }
     else {
     Write-Host "  ??  Data folder preserved" -ForegroundColor Yellow
-        Write-Host "     Location: ${env:ProgramData}\StampService" -ForegroundColor Gray
+        Write-Host "     Location: ${env:ProgramData}\AegisMint" -ForegroundColor Gray
     }
     
     if ($RemoveShares) {

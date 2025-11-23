@@ -1,7 +1,7 @@
-; Unified Inno Setup Script for Complete Stamp Service Distribution
+; Unified Inno Setup Script for Complete Aegis Mint Distribution
 ; Installs: Windows Service + AdminCLI + AdminGUI in one installer
 
-#define MyAppName "Stamp Service"
+#define MyAppName "Aegis Mint"
 #define MyAppVersion "1.0.0"
 #define MyAppPublisher "Your Organization"
 #define MyAppURL "https://github.com/commentors-net/stamp-service"
@@ -19,11 +19,11 @@ AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
-DefaultDirName={autopf}\StampService
+DefaultDirName={autopf}\AegisMint
 DefaultGroupName={#MyAppName}
 AllowNoIcons=yes
 OutputDir=..\
-OutputBaseFilename=StampService-Complete-Setup-{#MyAppVersion}
+OutputBaseFilename=AegisMint-Complete-Setup-{#MyAppVersion}
 Compression=lzma2/max
 SolidCompression=yes
 PrivilegesRequired=admin
@@ -42,7 +42,7 @@ Name: "server"; Description: "Server installation (Service + AdminCLI only)"
 Name: "custom"; Description: "Custom installation"; Flags: iscustom
 
 [Components]
-Name: "service"; Description: "Stamp Service (Windows Service)"; Types: full server custom; Flags: fixed
+Name: "service"; Description: "Aegis Mint Service (Windows Service)"; Types: full server custom; Flags: fixed
 Name: "admincli"; Description: "AdminCLI (Command-line administration tool)"; Types: full server custom; Flags: fixed
 Name: "admingui"; Description: "AdminGUI (Desktop administration tool)"; Types: full custom
 
@@ -70,21 +70,12 @@ Source: "..\dist\Documentation\*"; DestDir: "{app}\Documentation"; Flags: ignore
 Source: "..\dist\version.json"; DestDir: "{app}"; Flags: ignoreversion
 
 [Icons]
-; Start Menu shortcuts - Service
-Name: "{group}\Service\Service Status"; Filename: "{app}\AdminCLI\{#AdminCLIExeName}"; Parameters: "status"; WorkingDir: "{app}\AdminCLI"; Comment: "Check service status"
-Name: "{group}\Service\Test Stamp"; Filename: "{app}\AdminCLI\{#AdminCLIExeName}"; Parameters: "test-stamp"; WorkingDir: "{app}\AdminCLI"; Comment: "Test service"
-Name: "{group}\Service\View Logs"; Filename: "{commonappdata}\StampService\Logs"; Comment: "View service logs"
-
 ; Start Menu shortcuts - AdminGUI
-Name: "{group}\Admin GUI"; Filename: "{app}\AdminGUI\{#AdminGUIExeName}"; WorkingDir: "{app}\AdminGUI"; Components: admingui; Comment: "Stamp Service Admin GUI"
+Name: "{group}\Admin GUI"; Filename: "{app}\AdminGUI\{#AdminGUIExeName}"; WorkingDir: "{app}\AdminGUI"; Components: admingui; Comment: "Aegis Mint Admin GUI"
 Name: "{group}\Documentation"; Filename: "{app}\Documentation"; Comment: "View documentation"
 
-; Start Menu shortcuts - Uninstaller
-Name: "{group}\Complete Uninstaller"; Filename: "powershell.exe"; Parameters: "-ExecutionPolicy Bypass -File ""{app}\Scripts\Complete-Uninstaller.ps1"""; WorkingDir: "{app}\Scripts"; Comment: "Remove all components"
-Name: "{group}\{cm:UninstallProgram,{#MyAppName}}"; Filename: "{uninstallexe}"
-
 ; Desktop shortcut
-Name: "{autodesktop}\{#MyAppName} Admin"; Filename: "{app}\AdminGUI\{#AdminGUIExeName}"; Tasks: desktopicon; WorkingDir: "{app}\AdminGUI"; Components: admingui; Comment: "Stamp Service Administration"
+Name: "{autodesktop}\{#MyAppName} Admin"; Filename: "{app}\AdminGUI\{#AdminGUIExeName}"; Tasks: desktopicon; WorkingDir: "{app}\AdminGUI"; Components: admingui; Comment: "Aegis Mint Administration"
 
 ; Quick Launch shortcut
 Name: "{userappdata}\Microsoft\Internet Explorer\Quick Launch\{#MyAppName} Admin"; Filename: "{app}\AdminGUI\{#AdminGUIExeName}"; Tasks: quicklaunchicon; WorkingDir: "{app}\AdminGUI"; Components: admingui
@@ -120,10 +111,10 @@ begin
     'Select Data Directory',
     'Where should service data be stored?',
     'The service will store logs, keys, and configuration in this directory.' + #13#10 + #13#10 +
-    'Default location: C:\ProgramData\StampService',
-    False, 'StampService');
+    'Default location: C:\ProgramData\AegisMint',
+    False, 'AegisMint');
   DataDirPage.Add('');
-  DataDirPage.Values[0] := ExpandConstant('{commonappdata}\StampService');
+  DataDirPage.Values[0] := ExpandConstant('{commonappdata}\AegisMint');
   
   // Add checkbox for preserving data on uninstall
   PreserveDataCheckbox := TNewCheckBox.Create(DataDirPage);
@@ -183,6 +174,6 @@ end;
 [Messages]
 ; Custom messages
 WelcomeLabel1=Welcome to the [name] Setup Wizard
-WelcomeLabel2=This will install the complete Stamp Service on your computer.%n%nComponents to be installed:%n%n• Windows Service (cryptographic signing service)%n• AdminCLI (command-line administration tool)%n• AdminGUI (desktop administration interface)%n%nIt is recommended that you close all other applications before continuing.
+WelcomeLabel2=This will install the complete Aegis Mint platform on your computer.%n%nComponents to be installed:%n%n? Windows Service (cryptographic signing service)%n? AdminCLI (command-line administration tool)%n? AdminGUI (desktop administration interface)%n%nIt is recommended that you close all other applications before continuing.
 FinishedHeadingLabel=Completing the [name] Setup Wizard
-FinishedLabel=The Stamp Service has been installed on your computer.%n%nService installed as: SecureStampService%n%nYou can manage the service using:%n• AdminGUI from the Start Menu or Desktop%n• AdminCLI from the command line%n%nIMPORTANT: Create backup shares immediately after installation!
+FinishedLabel=Aegis Mint has been installed on your computer.%n%nService installed as: SecureStampService%n%nYou can manage the service using:%n? AdminGUI from the Start Menu or Desktop%n? AdminCLI from the command line%n%nIMPORTANT: Create backup shares immediately after installation!

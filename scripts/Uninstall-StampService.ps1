@@ -77,14 +77,14 @@ if ($RemoveData) {
         }
         
         # Remove data directory (logs, etc.)
-        $DataPath = "C:\ProgramData\StampService"
+        $DataPath = "C:\ProgramData\AegisMint"
         if (Test-Path $DataPath) {
             Remove-Item -Path $DataPath -Recurse -Force
             Write-Host "  Data directory removed: $DataPath" -ForegroundColor Green
         }
         
         # Remove installation directory
-        $InstallPath = "C:\Program Files\StampService"
+        $InstallPath = "C:\Program Files\AegisMint"
         if (Test-Path $InstallPath) {
             Remove-Item -Path $InstallPath -Recurse -Force
             Write-Host "  Installation directory removed: $InstallPath" -ForegroundColor Green
