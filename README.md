@@ -1,4 +1,4 @@
-﻿# Secure Stamp Service
+﻿# Secure Stamp Service V.1.0.0
 
 > A local, HSM-like signing authority implemented as a Windows Service (.NET 8)
 
