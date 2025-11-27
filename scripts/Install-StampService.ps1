@@ -3,13 +3,13 @@
 
 param(
     [Parameter(Mandatory=$false)]
-    [string]$InstallPath = "C:\Program Files\StampService",
+    [string]$InstallPath = "C:\Program Files\AegisMint",
     
     [Parameter(Mandatory=$false)]
     [string]$ServiceName = "SecureStampService",
     
     [Parameter(Mandatory=$false)]
-    [string]$DataPath = "C:\ProgramData\StampService"
+    [string]$DataPath = "C:\ProgramData\AegisMint"
 )
 
 $ErrorActionPreference = "Stop"

@@ -26,7 +26,7 @@ public partial class App : System.Windows.Application
         {
             var result = MessageBox.Show(
       "⚠️ Administrator Privileges Required\n\n" +
-        "This application requires administrator privileges to manage the Stamp Service.\n\n" +
+        "This application requires administrator privileges to manage Aegis Mint.\n\n" +
      "Would you like to restart with administrator privileges?",
                 "Administrator Required",
      MessageBoxButton.YesNo,

@@ -10,7 +10,7 @@ param(
 $ErrorActionPreference = "Stop"
 
 Write-Host "========================================" -ForegroundColor Cyan
-Write-Host "  Stamp Service - Complete Distribution" -ForegroundColor Cyan
+Write-Host "  Aegis Mint - Complete Distribution" -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host ""
 Write-Host "Configuration: $Configuration" -ForegroundColor White
@@ -34,7 +34,7 @@ Write-Host ""
 
 # Build StampService
 Write-Host "========================================" -ForegroundColor Cyan
-Write-Host "Building StampService..." -ForegroundColor Cyan
+Write-Host "Building Aegis Mint Service..." -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host ""
 
@@ -42,10 +42,10 @@ $ServiceProject = Join-Path $RootDir "src\StampService\StampService.csproj"
 & dotnet publish $ServiceProject -c $Configuration -o (Join-Path $DistDir "StampService") -p:Version=$Version
 
 if ($LASTEXITCODE -ne 0) {
-    Write-Host "? StampService build failed!" -ForegroundColor Red
+    Write-Host "? Aegis Mint Service build failed!" -ForegroundColor Red
     exit 1
 }
-Write-Host "? StampService built successfully" -ForegroundColor Green
+Write-Host "? Aegis Mint Service built successfully" -ForegroundColor Green
 Write-Host ""
 
 # Build AdminCLI
@@ -160,7 +160,7 @@ Write-Host "========================================" -ForegroundColor Cyan
 Write-Host ""
 
 $Timestamp = Get-Date -Format "yyyyMMdd-HHmmss"
-$ZipName = "StampService-Distribution-$Version-$Timestamp.zip"
+$ZipName = "AegisMint-Distribution-$Version-$Timestamp.zip"
 $ZipPath = Join-Path $RootDir $ZipName
 
 Compress-Archive -Path "$DistDir\*" -DestinationPath $ZipPath -CompressionLevel Optimal -Force
@@ -173,48 +173,101 @@ Write-Host ""
 # Build AdminGUI installer (if requested and Inno Setup available)
 if ($IncludeAdminGUI) {
     Write-Host "========================================" -ForegroundColor Cyan
-    Write-Host "Building Unified Installer..." -ForegroundColor Cyan
+    Write-Host "Building Aegis Mint Installer..." -ForegroundColor Cyan
     Write-Host "========================================" -ForegroundColor Cyan
     Write-Host ""
 
- $InnoSetupPath = "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe"
-    if (Test-Path $InnoSetupPath) {
-      $InstallerScript = Join-Path $ScriptDir "Complete-Installer.iss"
-        if (Test-Path $InstallerScript) {
-            try {
-      Write-Host "Updating version in installer script..." -ForegroundColor Cyan
-    $ScriptContent = Get-Content $InstallerScript -Raw
-    $ScriptContent = $ScriptContent -replace '#define MyAppVersion ".*"', "#define MyAppVersion `"$Version`""
-    Set-Content -Path $InstallerScript -Value $ScriptContent -NoNewline
+    $InnoSetupPath = "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe"
     
-                Write-Host "Compiling installer with Inno Setup..." -ForegroundColor Cyan
-     Write-Host "  Compiler: $InnoSetupPath" -ForegroundColor Gray
-            Write-Host "  Script: $InstallerScript" -ForegroundColor Gray
-          Write-Host ""
-    
-  $InnoArgs = @("/Q", $InstallerScript)
-             & $InnoSetupPath @InnoArgs
-        
-      if ($LASTEXITCODE -eq 0) {
-          Write-Host "? Unified installer created successfully!" -ForegroundColor Green
-          }
+    # Check if Inno Setup is installed
+    if (-not (Test-Path $InnoSetupPath)) {
+        Write-Host "? ERROR: Inno Setup 6 not found!" -ForegroundColor Red
+        Write-Host "" 
+        Write-Host "Expected location: $InnoSetupPath" -ForegroundColor Yellow
+        Write-Host ""
+        Write-Host "Please install Inno Setup 6 from:" -ForegroundColor Yellow
+        Write-Host "  https://jrsoftware.org/isdl.php" -ForegroundColor Cyan
+        Write-Host ""
+        Write-Host "After installation, run this script again to create the installer." -ForegroundColor Yellow
+        Write-Host ""
+        Write-Host "??  Skipping installer build - ZIP package was created successfully" -ForegroundColor Yellow
+    }
     else {
-        Write-Host "??  Installer build returned code: $LASTEXITCODE" -ForegroundColor Yellow
-            }
-            }
- catch {
-       Write-Host "??  Unified installer build failed (non-critical): $($_.Exception.Message)" -ForegroundColor Yellow
-         }
+        Write-Host "? Found Inno Setup at: $InnoSetupPath" -ForegroundColor Green
+        Write-Host ""
+        
+        $InstallerScript = Join-Path $ScriptDir "Complete-Installer.iss"
+        
+        if (-not (Test-Path $InstallerScript)) {
+            Write-Host "? ERROR: Installer script not found!" -ForegroundColor Red
+            Write-Host "Expected: $InstallerScript" -ForegroundColor Yellow
+            Write-Host ""
         }
         else {
-            Write-Host "??  Installer script not found: $InstallerScript" -ForegroundColor Yellow
+            Write-Host "? Found installer script: Complete-Installer.iss" -ForegroundColor Green
+            Write-Host ""
+            
+            try {
+                # Update version in installer script
+                Write-Host "Updating version in installer script..." -ForegroundColor Cyan
+                $ScriptContent = Get-Content $InstallerScript -Raw
+                $ScriptContent = $ScriptContent -replace '#define MyAppVersion ".*"', "#define MyAppVersion `"$Version`""
+                Set-Content -Path $InstallerScript -Value $ScriptContent -NoNewline
+                Write-Host "? Version updated to: $Version" -ForegroundColor Green
+                Write-Host ""
+                
+                # Build installer with Inno Setup (verbose mode for debugging)
+                Write-Host "Compiling installer with Inno Setup..." -ForegroundColor Cyan
+                Write-Host "  Compiler: $InnoSetupPath" -ForegroundColor Gray
+                Write-Host "  Script: $InstallerScript" -ForegroundColor Gray
+                Write-Host "  Output: AegisMint-Complete-Setup-$Version.exe" -ForegroundColor Gray
+                Write-Host ""
+                Write-Host "--- Inno Setup Output ---" -ForegroundColor DarkGray
+                
+                # Run Inno Setup without /Q flag to see output
+                $InnoArgs = @($InstallerScript)
+                & $InnoSetupPath @InnoArgs
+                
+                Write-Host "--- End of Inno Setup Output ---" -ForegroundColor DarkGray
+                Write-Host ""
+                
+                # Check if installer was created
+                $ExpectedInstallerPath = Join-Path $RootDir "AegisMint-Complete-Setup-$Version.exe"
+                
+                if ($LASTEXITCODE -eq 0) {
+                    if (Test-Path $ExpectedInstallerPath) {
+                        $InstallerSize = [math]::Round(((Get-Item $ExpectedInstallerPath).Length / 1MB), 2)
+                        Write-Host "? Aegis Mint installer created successfully!" -ForegroundColor Green
+                        Write-Host "  Location: $ExpectedInstallerPath" -ForegroundColor Gray
+                        Write-Host "  Size: $InstallerSize MB" -ForegroundColor Gray
+                    }
+                    else {
+                        Write-Host "??  WARNING: Inno Setup completed but installer file not found!" -ForegroundColor Yellow
+                        Write-Host "Expected: $ExpectedInstallerPath" -ForegroundColor Gray
+                        Write-Host ""
+                        Write-Host "Possible issues:" -ForegroundColor Yellow
+                        Write-Host "  1. Check OutputDir in Complete-Installer.iss" -ForegroundColor Gray
+                        Write-Host "  2. Verify dist folder structure matches [Files] section" -ForegroundColor Gray
+                        Write-Host "  3. Check Inno Setup compilation messages above" -ForegroundColor Gray
+                    }
+                }
+                else {
+                    Write-Host "? ERROR: Installer build failed!" -ForegroundColor Red
+                    Write-Host "Exit code: $LASTEXITCODE" -ForegroundColor Yellow
+                    Write-Host ""
+                    Write-Host "Please review the Inno Setup output above for error details." -ForegroundColor Yellow
+                }
+            }
+            catch {
+                Write-Host "? ERROR: Installer build exception!" -ForegroundColor Red
+                Write-Host "Exception: $($_.Exception.Message)" -ForegroundColor Yellow
+                Write-Host ""
+                Write-Host "Stack trace:" -ForegroundColor Gray
+                Write-Host $_.Exception.StackTrace -ForegroundColor DarkGray
+            }
         }
     }
-    else {
-   Write-Host "??  Inno Setup not installed - Skipping unified installer" -ForegroundColor Gray
-        Write-Host "   Install from: https://jrsoftware.org/isdl.php" -ForegroundColor Gray
-    }
- Write-Host ""
+    Write-Host ""
 }
 
 # Summary
@@ -230,25 +283,40 @@ Write-Host "  Build Date: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')" -Foreground
 Write-Host ""
 
 Write-Host "Distribution Files:" -ForegroundColor Cyan
-Write-Host "  ZIP Package:" -ForegroundColor White
-Write-Host "    $ZipName" -ForegroundColor Gray
+Write-Host ""
+Write-Host "  ? ZIP Package:" -ForegroundColor Green
+Write-Host "    $ZipName" -ForegroundColor White
+Write-Host "    Location: $ZipPath" -ForegroundColor Gray
 Write-Host "    Size: $ZipSize MB" -ForegroundColor Gray
 Write-Host ""
 
 if ($IncludeAdminGUI) {
-    $InstallerPath = Join-Path $RootDir "StampService-Complete-Setup-$Version.exe"
+    $InstallerPath = Join-Path $RootDir "AegisMint-Complete-Setup-$Version.exe"
     if (Test-Path $InstallerPath) {
         $InstallerSize = [math]::Round(((Get-Item $InstallerPath).Length / 1MB), 2)
-        Write-Host "  Unified Installer:" -ForegroundColor White
-Write-Host "    StampService-Complete-Setup-$Version.exe" -ForegroundColor Gray
-     Write-Host "    Size: $InstallerSize MB" -ForegroundColor Gray
-      Write-Host "    Includes: Service + AdminCLI + AdminGUI" -ForegroundColor Gray
+        Write-Host "  ? Aegis Mint Installer (EXE):" -ForegroundColor Green
+        Write-Host "    AegisMint-Complete-Setup-$Version.exe" -ForegroundColor White
+        Write-Host "    Location: $InstallerPath" -ForegroundColor Gray
+        Write-Host "    Size: $InstallerSize MB" -ForegroundColor Gray
+        Write-Host "    Includes: Service + AdminCLI + AdminGUI" -ForegroundColor Gray
+        Write-Host ""
+    }
+    else {
+        Write-Host "  ? Aegis Mint Installer (EXE):" -ForegroundColor Yellow
+        Write-Host "    NOT CREATED - See warnings above" -ForegroundColor Yellow
+        Write-Host ""
+        Write-Host "    Possible causes:" -ForegroundColor Gray
+        Write-Host "      • Inno Setup not installed" -ForegroundColor DarkGray
+        Write-Host "      • Inno Setup compilation errors" -ForegroundColor DarkGray
+        Write-Host "      • Missing files in dist folder" -ForegroundColor DarkGray
+        Write-Host ""
+        Write-Host "    The ZIP package is still available and fully functional." -ForegroundColor Cyan
         Write-Host ""
     }
 }
 
 Write-Host "Components:" -ForegroundColor Cyan
-Write-Host "  ? StampService (Windows Service)" -ForegroundColor White
+Write-Host "  ? Aegis Mint Service (Windows Service)" -ForegroundColor White
 Write-Host "  ? AdminCLI (Command-line tool)" -ForegroundColor White
 if ($IncludeAdminGUI) {
     Write-Host "  ? AdminGUI (Desktop application)" -ForegroundColor White
@@ -262,15 +330,25 @@ Write-Host "  1. Test installation on clean Windows machine" -ForegroundColor Ye
 Write-Host "  2. Verify all components work correctly" -ForegroundColor Yellow
 Write-Host "  3. Test backup/recovery process" -ForegroundColor Yellow
 if ($IncludeAdminGUI) {
-    Write-Host "  4. Test AdminGUI installer and all features" -ForegroundColor Yellow
+    $InstallerPath = Join-Path $RootDir "AegisMint-Complete-Setup-$Version.exe"
+    if (Test-Path $InstallerPath) {
+        Write-Host "  4. Test Aegis Mint installer and all features" -ForegroundColor Yellow
+    }
+    else {
+        Write-Host "  4. Install Inno Setup and re-run to create EXE installer (optional)" -ForegroundColor Yellow
+    }
 }
 Write-Host ""
 
 Write-Host "Distribution Locations:" -ForegroundColor Cyan
 Write-Host "  Build artifacts: $DistDir" -ForegroundColor White
 Write-Host "  ZIP package: $ZipPath" -ForegroundColor White
-if ($IncludeAdminGUI -and (Test-Path (Join-Path $RootDir "StampService-Complete-Setup-$Version.exe"))) {
-    Write-Host "  Unified installer: $(Join-Path $RootDir "StampService-Complete-Setup-$Version.exe")" -ForegroundColor White
+$InstallerPath = Join-Path $RootDir "AegisMint-Complete-Setup-$Version.exe"
+if ($IncludeAdminGUI -and (Test-Path $InstallerPath)) {
+    Write-Host "  Aegis Mint installer: $InstallerPath" -ForegroundColor White
+}
+else {
+    Write-Host "  Aegis Mint installer: Not created (use ZIP for manual installation)" -ForegroundColor DarkGray
 }
 Write-Host ""
 

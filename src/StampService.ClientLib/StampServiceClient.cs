@@ -109,6 +109,7 @@ public class StampServiceClient : IDisposable
         var createdAt = result.GetProperty("createdAt").GetDateTime();
         var metadata = JsonSerializer.Deserialize<Dictionary<string, string>>(
             result.GetProperty("metadata").GetRawText()) ?? new Dictionary<string, string>();
+        metadata.Add("Name", name);
 
         return (value, createdAt, metadata);
     }
